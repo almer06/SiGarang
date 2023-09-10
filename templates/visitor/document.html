@@ -1,0 +1,60 @@
+{% extends 'visitor/layouts/base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="text-success text-center text-uppercase">Dokumen</h1>
+
+        <form method="get">
+            <div class="row">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="name"
+                               placeholder="Cari Nama Dokumen">
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <button type="submit" class="btn btn-primary px-4 mb-3">Cari</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-success">
+                <tr>
+                    <th class="text-center align-middle">No</th>
+                    <th class="text-center align-middle">Nama Dokumen</th>
+                    <th class="text-center align-middle">Sektor</th>
+                    <th class="text-center align-middle">Detail</th>
+                    {% if user.is_authenticated %}
+                        <th class="text-center align-middle">Download</th>
+                    {% endif %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for object in object_list %}
+                    <tr>
+                        <th>{{ forloop.counter }}</th>
+                        <th>{{ object.document_name }}</th>
+                        <th>{{ object.document_sector }}</th>
+                        <th class="text-center" data-bs-toggle="tooltip" data-bs-title="{{ object.document_detail}}" data-bs-placement="top">{{ object.document_detail|truncatewords:5 }}</th>
+                        {% if user.is_authenticated %}
+                        	<th class="text-center">
+                                <a href="{{ object.document_file.url }}" class="btn btn-primary">Download</a>
+                            </th>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <th colspan="4" class="text-center">Data tidak ditemukan</th>
+                    </tr>
+                {% endfor %}
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="{% static 'images/favicon/favicon.ico' %}" type="image/x-icon">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static 'vendor/css/simple-notify.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/visitor/styles.css' %}">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs/dist/cdn.min.js"></script>
+
+</head>
+<body>
+{% block navigation %}
+    {% include 'visitor/layouts/navigation.html' %}
+{% endblock %}
+
+<div id="load-page" class="d-flex justify-content-center align-items-center flex-column min-vh-100">
+    <div class="spinner-border text-success" role="status"></div>
+</div>
+
+{% block hero %}
+    {% include 'visitor/layouts/hero.html' %}
+{% endblock %}
+
+{% block content %}
+
+{% endblock %}
+
+{% block footer %}
+    {% include 'visitor/layouts/footer.html' %}
+{% endblock %}
+
+
+<script src="{% static 'vendor/script/bootstrap.bundle.min.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{% static 'vendor/script/simple-notify.min.js' %}"></script>
+<script src="{% static 'script/visitor/script.js' %}"></script>
+{% block script %}
+
+{% endblock %}
+</body>
+</html>

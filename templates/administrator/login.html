@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static 'vendor/css/bootstrap.min.css' %}">
+</head>
+<body>
+<section class="bg-secondary min-vh-100 d-flex justify-content-center align-items-center">
+    <div class="card shadow-sm text-bg-success border-0 mx-4" style="width: min(100%, 28rem)">
+        <div class="card-body p-4">
+            <img src="{% static 'images/logo.png' %}" alt="logo Disperdag" height="100" class="d-block mx-auto mb-4">
+            <form class="mb-4">
+                <div class="mb-3">
+                  <label for="username" class="mb-1">Username</label>
+                  <input type="text" class="form-control rounded-1" id="username">
+                </div>
+                <div class="mb-3">
+                  <label for="password" class="mb-1">Password</label>
+                  <input type="password" class="form-control rounded-1" id="password">
+                </div>
+                <button class="btn btn-primary px-4 d-block ms-auto">Login</button>
+            </form>
+            <p class="text-center">Belum Punya akun? <a href="#">Daftar</a></p>
+        </div>
+    </div>
+</section>
+
+<script src="{% static 'vendor/script/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

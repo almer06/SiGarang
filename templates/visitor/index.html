@@ -1,0 +1,43 @@
+{% extends 'visitor/layouts/base.html' %}
+{% load static %}
+
+{% block content %}
+    <h1 class="text-uppercase text-center text-success fw-bold">Berita Terbaru</h1>
+
+    <div class="container">
+        <div class="row g-2 mb-5">
+            {% for i in '012345'|make_list %}
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    <div class="card" style="cursor: pointer;">
+                        <img src="https://source.unsplash.com/random/?news" width="100%" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <p class="card-text">Some quick example text to build on the card title and make up the bulk
+                                of the card's content.</p>
+                            <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+                        </div>
+                    </div>
+                </div>
+
+            {% endfor %}
+        </div>
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-end">
+                <li class="page-item disabled">
+                    <a class="page-link">Previous</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
+
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d508924.45242840814!2d96.71219705455505!3d4.774737168250307!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30388c1d8bd63877%3A0xc7c01de53e9c64b6!2sKabupaten%20Bener%20Meriah%2C%20Aceh!5e0!3m2!1sid!2sid!4v1690760233127!5m2!1sid!2sid"
+                style="border:0; width: min(100%, 600px); aspect-ratio: 4/3" allowfullscreen="" loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+
+{% endblock %}

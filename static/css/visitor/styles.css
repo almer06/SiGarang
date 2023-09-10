@@ -1,0 +1,7 @@
+.ukm-image,
+.ikm-image {
+    width: min(100%, 768px);
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    object-position: center;
+}
