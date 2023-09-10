@@ -1,0 +1,44 @@
+{% extends 'visitor/layouts/base.html' %}
+{% load static %}
+
+{% block style_scoped %}
+<style>
+.logo_bener_meriah {
+    max-width: 400px;
+    width: 100%;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row gy-5 my-1">
+            <div class="col-md-6 d-flex align-items-center justify-content-center">
+                <img src="{% static 'images/logo.png' %}" alt="logo Bener Meriah" class="logo_bener_meriah">
+            </div>
+            <div class="col-md-6">
+                <h1>DISPERDAG KABUPATEN BENER MERIAH</h1>
+                <h2>VISI: </h2>
+                <p>Terwujudnya Masyarakat Indutri Kecil Dan Menengah Yang Tangguh, Berbasis Pada Potensi Daerah Dan Sistem Perdagangan Yang Efisien, Serta Mampu Menjaga Keseimbangan Pasar Secara Sehat Dan Berkeadilan</p>
+                <h2>Misi: </h2>
+                <ol type="1">
+                    <li>Peningkatan Kualitas Dan Kuantitas Serta Diversifikasi Produk Industri Kecil Dan Menengah Serta
+                        Perdagangan Yang Mampu Bersaing Secara Sehat Dan Mandiri
+                    </li>
+                    <li>Meningkatkan Kelancaran Distribusi Barang/Jasa Yang Didukung Dengan Sarana Pendukung Dan Sistem
+                        Distribusi Yang Efektif, Efisien, Serta Berkelanjutan
+                    </li>
+                    <li>Mendorong Peningkatan Mutu Dan Daya Saing Pelaku Usaha Industri Dan Perdagangan Serta
+                        Peningkatan Perlindungan Yang Efektif Terhadap Konsumen
+                    </li>
+                    <li>Meningkatkan Promosi Hasil Unggulan Daerah Ke Dalam Dan Luar Negeri</li>
+                    <li>Memfasilitasi Pengembangan Industri Menengah Dan Industri Besar</li>
+                    <li>Menciptakan Peluang Dan Pangsa Pasar Dalam Dan Luar Negeri</li>
+                    <li>Meningkatan Kualitas Sistem Administrasi Perkantoran.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

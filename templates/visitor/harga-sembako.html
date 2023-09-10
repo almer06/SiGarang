@@ -1,0 +1,144 @@
+{% extends 'visitor/layouts/base.html' %}
+
+{% block content %}
+    <div class="container">
+
+        <h1 class="text-center text-success mb-3">HARGA SEMBAKO</h1>
+        {% if user.is_authenticated %}
+            <a href="{% url 'visitor:excel_sembako' %}" class="btn btn-primary mt-5 mb-3">Export Excel</a>
+        {% endif %}
+
+
+        <form method="get">
+            <div class="row">
+                <div class="col-12 col-sm-6 col-lg-4 mb-3">
+                    <input type="text" autocomplete="off" value="{{ request.GET.name }}" name="name" class="form-control" placeholder="Cari Bahan Pokok">
+                </div>
+                <div class="col-12 col-sm-6 col-lg-4 mb-3">
+                    <button class="btn btn-primary px-4">Cari</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead class="table-success">
+                <tr>
+                    <th class="text-center">No.</th>
+                    <th class="text-center">Nama Variant</th>
+                    <th class="text-center">Kuantitas</th>
+                    <th class="text-center">Satuan</th>
+                    <th class="text-center">Harga Kemarin</th>
+                    <th class="text-center">Harga Hari ini</th>
+                    <th class="text-center">Statistik</th>
+                </tr>
+            </thead>
+        <tbody id="table-body"></tbody>
+    </table>
+    </div>
+    </div>
+
+
+{% endblock %}
+
+{% block script %}
+<script>
+
+let row_data_sembako = []
+const graph_icon = {
+    'up': '<i class="bi bi-caret-up-fill text-danger"></i>',
+    'equal': '<i class="text-secondary fw-bold">=</i>',
+    'down': '<i class="bi bi-caret-down-fill text-success"></i>'
+}
+let price_today = {}
+let price_lastday = {}
+
+$.ajax({
+    url: {% url 'visitor:sembako' %},
+    success: function (data) {
+        row_data_sembako = data.data
+        row_data_sembako.forEach((item, index) => {
+            $('#table-body').append(renderTableBody(item, index))
+            detailSembako(item, index)
+            detailSembakoYesterday(item, index)
+        })
+
+
+    },
+})
+
+
+function detailSembako(sembako, index) {
+    const url = '{% url "visitor:sembako" %}?id_sembako=' + encodeURIComponent(sembako.groceries_id)
+    $.ajax({
+        url: url,
+        success: function (value) {
+            const { data } = value
+
+            const item = data[0] || {}
+            const price = item.unit_groceries_price || 0
+            const unit = item.unit_groceries_massa || ''
+            const quantity = item.unit_groceries_quantity
+
+            price_today[sembako.groceries_name] = price
+            renderStatistik(sembako.groceries_name)
+
+            $(`#quantity${index}`).text(quantity)
+            $(`#unit${index}`).text(unit)
+            $(`#price${index}`).text(price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'))
+        },
+    })
+}
+
+function detailSembakoYesterday(sembako, index) {
+    const url = '{% url "visitor:sembako" %}?id_sembako=' + encodeURIComponent(sembako.groceries_id)
+        + '&create=yesterday'
+    $.ajax({
+        url: url,
+        success: function (value) {
+            const { data } = value
+            const price = data[0] ? data[0].unit_groceries_price : 0
+
+            price_lastday[sembako.groceries_name] = price
+            renderStatistik(sembako.groceries_name)
+
+            $(`#price-yesterday${index}`).text(price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'))
+        }
+    })
+}
+
+function renderTableBody(data, index) {
+    return `
+        <tr>
+            <td class="text-center">${index+1}</td>
+            <td>${data.groceries_name}</td>
+            <td id="quantity${index}" class="text-center"></td>
+            <td id="unit${index}" class="text-center"></td>
+            <td id="price-yesterday${index}" class="text-center"></td>
+            <td id="price${index}" class="text-center"></td>
+            <td id="statistic-${data.groceries_name}" class="statistic text-center"></td>
+        </tr>
+    `
+}
+
+function renderStatistik(name) {
+  const today = Object.keys(price_today).find(item => item === name)
+  const yesterday = Object.keys(price_lastday).find(item => item === name)
+
+  if (!(today && yesterday)) {
+    return 0;
+  }
+
+  const price_now = price_today[name]
+  const price_last = price_lastday[name]
+
+  const icon = price_last > price_now ? 'down' : (price_now === price_last ? 'equal' : 'up');
+  document.getElementById(`statistic-${name}`).innerHTML = graph_icon[icon]
+
+}
+
+
+
+</script>
+
+{% endblock %}

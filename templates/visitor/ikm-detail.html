@@ -1,0 +1,67 @@
+{% extends 'visitor/layouts/base.html' %}
+{% load static %}
+
+{% block hero %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="container-md mt-5">
+        <img src="{{ object.ikm_image.url }}" alt="Image IKM" class="d-block mx-auto ikm-image">
+
+        <div class="table-responsive mt-5">
+            <table class="table table-borderless table-hover">
+                <tbody>
+                    <tr>
+                        <td class="text-nowrap">Nama Usaha</td>
+                        <td>{{ object.ikm_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Nama Pemilik</td>
+                        <td>{{ object.ikm_owner }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Jenis Product</td>
+                        <td>{{ object.ikm_types_product }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Legalitas</td>
+                        <td>{{ object.ikm_legality }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Outlet</td>
+                        <td>{{ object.ikm_outlet }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Deskripsi</td>
+                        <td>{{ object.ikm_description }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Alamat</td>
+                        <td>{{ object.ikm_address }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Nomor Handphone</td>
+                        <td>{{ object.ikm_number_phone }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Website</td>
+                        {% if 'None' not in object.ikm_website %}
+                            <td><a href="{{ object.ikm_website }}" target="_blank">{{ object.ikm_website }}</a></td>
+                        {% else %}
+                            <td>-</td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Sosial Media</td>
+                        {% if 'None' not in object.ikm_website %}
+                            <td><a href="{{ object.ikm_social_media }}" target="_blank">{{ object.ikm_social_media }}</a></td>
+                        {% else %}
+                            <td>-</td>
+                        {% endif %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

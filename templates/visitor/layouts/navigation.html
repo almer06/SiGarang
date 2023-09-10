@@ -1,0 +1,75 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg bg-success navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand d-none d-sm-flex align-items-center gap-2" href="{% url 'visitor:harga_sembako' %}">
+            <img src="{% static 'images/logo.png' %}" alt="logo bener meriah" width="30">
+            SISTEM INFORMASI HARGA BARANG
+        </a>
+        <a class="navbar-brand d-sm-none d-flex align-items-center gap-2" href="{% url 'visitor:harga_sembako' %}">
+            <img src="{% static 'images/logo.png' %}" alt="logo bener meriah" width="30">
+            SIGARANG
+        </a>
+
+        <div class="d-flex d-sm-none align-items-center" style="column-gap: 16px">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            {% if request.user.is_authenticated %}
+            <div class="dropdown">
+                <i class="bi bi-person-circle text-white fs-3" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false"></i>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{% url 'visitor:logout' %}">Logout</a></li>
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'visitor:harga_sembako' %}">HOME</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'visitor:agenda' %}">AGENDA</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'visitor:document' %}">DOKUMEN</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        INFORMASI PUBLIK
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'visitor:ukm' %}">UKM</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="{% url 'visitor:ikm' %}">IKM</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="navbar-nav d-flex align-items-center" style="column-gap: 8px">
+                {% if request.user.is_authenticated %}
+                    <a class="dropdown-item text-white d-none d-sm-block">{{ user }}</a>
+                    <div class="dropdown d-none d-sm-block">
+                        <i class="bi bi-person-circle text-white fs-3" style="cursor: pointer;" data-bs-display="static"
+                           aria-expanded="false" data-bs-toggle="dropdown"></i>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'visitor:logout' %}">LOGOUT</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+
+                    <li class="w-100" style="min-width: fit-content">
+                        <a href="{% url 'visitor:login' %}" class="btn btn-primary w-100">LOGIN</a>
+                    </li>
+                    <li class="w-100" style="min-width: fit-content">
+                        <a href="{% url 'visitor:register' %}" class="btn text-white w-100">SIGN UP</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+</nav>

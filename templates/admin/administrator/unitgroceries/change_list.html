@@ -1,0 +1,208 @@
+{% extends 'admin/change_list.html' %}
+{% load static %}
+
+{% block extrastyle %}
+	{{ block.super }}
+
+    <style>
+        .dialog-import {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .7);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: all 300ms;
+            visibility: hidden;
+        }
+
+        .card {
+            background: #121212;
+            width: min(100%, 320px);
+            position: relative;
+            padding: 50px 75px;
+            border-radius: 8px;
+            margin: 0 1.5rem;
+        }
+
+        .title-import {
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .show-dialog {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #file-import {
+            padding: 0;
+        }
+        #file-import::file-selector-button {
+            background-color: #264b5d;
+            color: #FFF;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        #date-import {
+            border-radius: 4px;
+            border: none;
+            padding: 8px 12px;
+        }
+
+        .button-import{
+            display: flex;
+            column-gap: 8px;
+            justify-content: end;
+        }
+
+        #cancel-import {
+            border: none;
+            border-radius: 4px;
+            background:#333;
+            transition: background-color 300ms;
+            padding: 10px 15px;
+            color: #FFF;
+            cursor: pointer;
+        }
+
+        #cancel-import:hover {
+            background: #747474;
+        }
+
+        .help-import {
+            padding: 0;
+            list-style-position: inside;
+        }
+
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="dialog-import" id="dialog-import">
+        <div class="card">
+            <h1 class="title-import">Import Bahan Pokok</h1>
+            <form method="post" id="form-import">
+                {% csrf_token %}
+                <div style="margin-bottom: 1.25rem;">
+                    <label for="file-import" style="font-weight: bold; display: block">File :</label>
+                    <input type="file" id="file-import" name="excel" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                    <ul class="help-import">
+                        <li>Support file: xlsx, xls</li>
+                        <li>Max. upload file 2MB</li>
+                        <li>Template/contoh file excel bisa di download <a href="{% static 'template/excel/Sample_bahan_pokok.xlsx' %}">disini</a></li>
+                    </ul>
+                </div>
+                <div style="margin-bottom: 1.25rem;">
+                    <label for="date-import" style="font-weight: bold; display: block">Hari :</label>
+                    <input type="date" id="date-import" name="tanggal">
+                </div>
+
+                <div class="button-import">
+                    <input type="submit" id="submit-import" name="Submit" value="Submit"/>
+                    <input type="reset" id="cancel-import" value="Cancel">
+                </div>
+            </form>
+        </div>
+    </div>
+
+	{{ block.super }}
+
+    <script>
+
+        $('#button-dialog-import').on('click', () => {
+            $('#dialog-import').toggleClass('show-dialog')
+        })
+
+        let form_data = new FormData()
+
+
+        $('#submit-import').on('click', async (e) => {
+            e.preventDefault()
+            form_data.set('csrfmiddlewaretoken', $('input[name="csrfmiddlewaretoken"]').val())
+
+            axios.post("{% url 'visitor:import_sembako' %}", form_data)
+            .then(({data}) => {
+                resetForm('form-import')
+                closeDialog()
+                new Notify ({
+                    status: 'success',
+                    title: 'Berhasil Import Bahan Pokok',
+                    effect: 'fade',
+                    speed: 300,
+                    customClass: '',
+                    customIcon: '',
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    gap: 20,
+                    distance: 20,
+                    type: 3,
+                    position: 'right top'
+                  })
+            })
+            .catch(({response}) => {
+                new Notify ({
+                    status: 'error',
+                    title: 'Inputan Tidak Valid',
+                    text: response.data.message,
+                    effect: 'fade',
+                    speed: 300,
+                    customClass: '',
+                    customIcon: '',
+                    showIcon: true,
+                    showCloseButton: true,
+                    autoclose: true,
+                    autotimeout: 3000,
+                    gap: 20,
+                    distance: 20,
+                    type: 3,
+                    position: 'right top'
+                  })
+            })
+
+        })
+
+        $('#cancel-import').on('click', () => {
+            clearFormData()
+            closeDialog()
+        })
+
+
+
+        $('#file-import').on('change', ({target}) => {
+            form_data.set('excel', target.files[0])
+        })
+
+        $('#date-import').on('change', ({target}) => {
+            form_data.set('tanggal', target.value)
+        })
+
+        function clearFormData() {
+            for (const formDatum of form_data.keys()) {
+                form_data.delete(formDatum)
+            }
+        }
+
+        function closeDialog() {
+            $('#dialog-import').toggleClass('show-dialog')
+        }
+
+        function resetForm(id_form) {
+            const form = $(`#${id_form}`)[0]
+            if (!form) {
+                throw Error(`Element by id not found.(${id_form})`)
+            }
+            form.reset()
+            clearFormData()
+        }
+
+    </script>
+{% endblock %}
