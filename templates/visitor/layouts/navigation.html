@@ -10,7 +10,7 @@
             SIGARANG
         </a>
 
-        <div class="d-flex d-md-none align-items-center" style="column-gap: 16px">
+        <div class="d-flex d-lg-none align-items-center" style="column-gap: 16px">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent"
                     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,8 +53,8 @@
             </ul>
             <ul class="navbar-nav d-flex align-items-center" style="column-gap: 8px">
                 {% if request.user.is_authenticated %}
-                    <a class="dropdown-item text-white d-none d-md-block">{{ user }}</a>
-                    <div class="dropdown d-none d-md-block">
+                    <a class="dropdown-item text-white d-none d-lg-block">{{ user }}</a>
+                    <div class="dropdown d-none d-lg-block">
                         <i class="bi bi-person-circle text-white fs-3" style="cursor: pointer;" data-bs-display="static"
                            aria-expanded="false" data-bs-toggle="dropdown"></i>
                         <ul class="dropdown-menu dropdown-menu-end">
