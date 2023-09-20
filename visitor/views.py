@@ -115,6 +115,13 @@ class DocumentVisitor(ListView):
         'title': 'Dokumen'
     }
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        name_filter = self.request.GET.get('name_document')
+        if name_filter:
+            queryset = queryset.filter(document_name__icontains=name_filter)
+        return queryset
+
 
 class HargaSembako(TemplateView):
     template_name = 'visitor/harga-sembako.html'
