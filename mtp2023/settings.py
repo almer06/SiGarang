@@ -12,9 +12,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -25,7 +28,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
+ALLOWED_HOSTS = ['127.0.0.1', ]
 
 # Application definition
 
@@ -78,10 +81,11 @@ WSGI_APPLICATION = 'mtp2023.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'free_mtp2023',
-        'USER': 'root',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USERNAME'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
         'CONN_MAX_AGE': 30
     }
 }
@@ -120,7 +124,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = BASE_DIR / 'assets'
 
 MEDIA_URL = 'uploads/'
 MEDIA_ROOT = BASE_DIR / 'uploads'
@@ -135,9 +139,12 @@ AUTH_USER_MODEL = 'visitor.User'
 SESSION_COOKIE_AGE = 900
 SESSION_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_PRELOAD = True
 
+CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = ['https://*.ngrok-free.app/']
 API_KEY_SENDINBLUE = os.getenv('SECRET_KEY_SENDINBLUE')
 
 PASSWORD_RESET_TIMEOUT = 900
 LOGIN_URL = '/login/'
+
