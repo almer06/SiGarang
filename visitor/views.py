@@ -333,8 +333,17 @@ def export_excel_harga_sembako(request):
     }
 
     df = pd.DataFrame(data)
-    with pd.ExcelWriter(response) as writer:
-        df.to_excel(writer, index=False)
+
+    with pd.ExcelWriter(response, engine='xlsxwriter') as writer:
+        workbook = writer.book
+        worksheet = workbook.add_worksheet('Data')
+
+        bold_format = workbook.add_format({'bold': True, 'font_size': 16})
+        worksheet.write('A1', 'Harga Sembako', bold_format)
+
+        worksheet.write('A2', f'Tanggal Export: {tanggal}')
+
+        df.to_excel(writer, sheet_name='Data', startrow=3, index=False)
 
     return response
 
