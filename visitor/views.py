@@ -465,11 +465,6 @@ def import_excel_sembako(request):
     })
 
 
-# def check_format_excel(tipe: list) -> bool:
-#     valid_tipe: list = [str, str, int, int]
-#
-#     return tipe == valid_tipe
-
 def check_format_excel(data_frame: pd.DataFrame):
     valid_tipe: list = [str, str, int, int]
 
@@ -483,3 +478,103 @@ def check_format_excel(data_frame: pd.DataFrame):
             return valid
 
     return True
+
+
+def export_ukm_to_excel(request):
+    tanggal = datetime.now().strftime("%d/%B/%Y")
+    name_excel = f"harga_sembako_{tanggal}"
+
+    # Query data dari model UKM
+    ukm_data = UKM.objects.all()
+
+    # Buat dataframe dari data model
+    data = {
+        'Name': [ukm.ukm_name for ukm in ukm_data],
+        'Owner': [ukm.ukm_owner for ukm in ukm_data],
+        'Number Phone': [ukm.ukm_number_phone for ukm in ukm_data],
+        'Legality': [ukm.ukm_legality for ukm in ukm_data],
+        'Type of Product': [ukm.ukm_types_product for ukm in ukm_data],
+        'Outlet': [ukm.ukm_outlet for ukm in ukm_data],
+        'Address': [ukm.ukm_address for ukm in ukm_data],
+        'Description': [ukm.ukm_description for ukm in ukm_data],
+        'Website': [ukm.ukm_website for ukm in ukm_data],
+        'Social Media': [ukm.ukm_social_media for ukm in ukm_data],
+    }
+
+    # Buat DataFrame dari data
+    df = pd.DataFrame(data)
+
+    # Buat response Excel
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'fattachment; filename="{name_excel}.xlsx"'
+
+    # Tulis data DataFrame ke response
+    df.to_excel(response, index=False)
+
+    return response
+
+
+def export_excel_ikm(request):
+    tanggal = datetime.now().strftime("%d/%B/%Y")
+    name_excel = f"harga_sembako_{tanggal}"
+
+    # Query data dari model UKM
+    ikm_data = IKM.objects.all()
+
+    # Buat dataframe dari data model
+    data = {
+        'Name': [ukm.ukm_name for ukm in ikm_data],
+        'Owner': [ukm.ukm_owner for ukm in ikm_data],
+        'Number Phone': [ukm.ukm_number_phone for ukm in ikm_data],
+        'Legality': [ukm.ukm_legality for ukm in ikm_data],
+        'Type of Product': [ukm.ukm_types_product for ukm in ikm_data],
+        'Outlet': [ukm.ukm_outlet for ukm in ikm_data],
+        'Address': [ukm.ukm_address for ukm in ikm_data],
+        'Description': [ukm.ukm_description for ukm in ikm_data],
+        'Website': [ukm.ukm_website for ukm in ikm_data],
+        'Social Media': [ukm.ukm_social_media for ukm in ikm_data],
+    }
+
+    # Buat DataFrame dari data
+    df = pd.DataFrame(data)
+
+    # Buat response Excel
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'fattachment; filename="{name_excel}.xlsx"'
+
+    # Tulis data DataFrame ke response
+    df.to_excel(response, index=False)
+
+    return response
+
+
+class ExportIKMToExcel(LoginRequiredMixin, View):
+    def get(self, request):
+        # Query semua data dari model IKM
+        ikm_data = IKM.objects.all()
+
+        # Buat DataFrame dari data IKM
+        data = {
+            'ID': [ikm.ikm_id for ikm in ikm_data],
+            'Name': [ikm.ikm_name for ikm in ikm_data],
+            'Owner': [ikm.ikm_owner for ikm in ikm_data],
+            'Phone Number': [ikm.ikm_number_phone for ikm in ikm_data],
+            'Legality': [ikm.ikm_legality for ikm in ikm_data],
+            'Type of Product': [ikm.ikm_types_product for ikm in ikm_data],
+            'Outlet': [ikm.ikm_outlet for ikm in ikm_data],
+            'Address': [ikm.ikm_address for ikm in ikm_data],
+            'Description': [ikm.ikm_description for ikm in ikm_data],
+            'Website': [ikm.ikm_website for ikm in ikm_data],
+            'Social Media': [ikm.ikm_social_media for ikm in ikm_data],
+        }
+
+        df = pd.DataFrame(data)
+
+        # Buat response HTTP dengan file Excel
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="ikm_data.xlsx"'
+
+        # Tulis data DataFrame ke file Excel
+        df.to_excel(response, index=False, engine='openpyxl')
+
+        return response

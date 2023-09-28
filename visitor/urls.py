@@ -18,6 +18,8 @@ urlpatterns = [
     path('sembako/', views.sembako, name='sembako'),
     path('export-excel-sembako/', views.export_excel_harga_sembako, name='excel_sembako'),
     path('import-excel-sembako/', views.import_excel_sembako, name='import_sembako'),
+    path('export-excel-ukm', views.export_ukm_to_excel, name='excel_ukm'),
+    path('export-ikm-excel/', views.ExportIKMToExcel.as_view(), name='export_ikm_excel'),
 
     path('reset_password/', views.PasswordResetViewVisitor.as_view(), name='reset_password'),
     path('reset/<uidb64>/<token>/', views.PasswordResetConfirmViewVisitor.as_view(), name='password_reset_confirm'),
