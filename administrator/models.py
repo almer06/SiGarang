@@ -143,12 +143,12 @@ class Document(models.Model):
 
 class AgenLPG(models.Model):
     agen_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    agen_name = models.CharField(_('Name'), max_length=255, unique=True)
+    agen_name = models.CharField(_('Nama Agen'), max_length=255, unique=True)
     agen_slug = models.SlugField(_('Slug'), max_length=255, blank=True)
-    agen_address = models.TextField(_('address'))
-    agen_number_phone = models.CharField(_('Number Phone'), max_length=15)
-    agen_base_name = models.CharField(_('Base'), max_length=255, unique=True)
-    agen_base_address = models.TextField(_('Base address'))
+    agen_address = models.TextField(_('Alamat Agen'))
+    agen_number_phone = models.CharField(_('Nomor Telepon'), max_length=15)
+    agen_base_name = models.CharField(_('Nama Pangkalan'), max_length=255, unique=True)
+    agen_base_address = models.TextField(_('Alamat Pangkalan'))
     agen_image = models.ImageField(_('Image'), upload_to='images/agen/')
     agen_created = models.DateTimeField(_('Created at'), auto_now_add=True)
     agen_updated = models.DateTimeField(auto_now=True)
@@ -167,13 +167,13 @@ class AgenLPG(models.Model):
 
 class KiosPupuk(models.Model):
     kios_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    kios_name = models.CharField(_('Name'), max_length=255, unique=True)
-    kios_address = models.TextField(_('address'))
+    kios_name = models.CharField(_('Nama Kios'), max_length=255, unique=True)
+    kios_address = models.TextField(_('Alamat Kios'))
     kios_slug = models.SlugField(_('Slug'), max_length=255, blank=True)
-    kios_number_phone = models.CharField(_('Number Phone'), max_length=15)
-    kios_distributor = models.CharField(_('Distributor'), max_length=255, unique=True)
-    kios_distributor_address = models.TextField(_('address'))
-    kios_image = models.ImageField(_('Image'), upload_to='images/kios/')
+    kios_number_phone = models.CharField(_('Nomor Telepon'), max_length=15)
+    kios_distributor = models.CharField(_('Nama Distributor'), max_length=255, unique=True)
+    kios_distributor_address = models.TextField(_('Alamat Distibutor'))
+    kios_image = models.ImageField(_('Gambar'), upload_to='images/kios/')
     kios_created = models.DateTimeField(_('Created at'), auto_now_add=True)
     kios_updated = models.DateTimeField(auto_now=True)
 
@@ -191,8 +191,8 @@ class KiosPupuk(models.Model):
 
 class Market(models.Model):
     market_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    market_name = models.CharField(_('Name'), max_length=255, unique=True)
-    market_address = models.TextField(_('address'))
+    market_name = models.CharField(_('Nama Pasar'), max_length=255, unique=True)
+    market_address = models.TextField(_('Alamat Pasar'))
     market_slug = models.SlugField(_('Slug'), max_length=255, blank=True)
     market_created = models.DateTimeField(_('Created at'), auto_now_add=True)
     market_updated = models.DateTimeField(auto_now=True)
