@@ -143,7 +143,7 @@ class Document(models.Model):
 
 class AgenLPG(models.Model):
     agen_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    agen_name = models.CharField(_('Nama Agen'), max_length=255, unique=True)
+    agen_name = models.CharField(_('Nama Agen'), max_length=255)
     agen_slug = models.SlugField(_('Slug'), max_length=255, blank=True)
     agen_address = models.TextField(_('Alamat Agen'))
     agen_number_phone = models.CharField(_('Nomor Telepon'), max_length=15)
@@ -161,7 +161,7 @@ class AgenLPG(models.Model):
         return f"{self.agen_name}"
 
     def save(self, **kwargs):
-        self.agen_slug = slugify(self.agen_name)
+        self.agen_slug = slugify(self.agen_base_name)
         return super().save()
 
 
@@ -206,4 +206,32 @@ class Market(models.Model):
 
     def save(self, **kwargs):
         self.market_slug = slugify(self.market_name)
+        return super().save()
+
+
+class StockItem(models.Model):
+    item_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    item_name = models.CharField(_('Nama Barang'), max_length=255)
+    item_slug = models.SlugField(_('Slug'), max_length=255, blank=True)
+    item_market = models.CharField(_('Nama Pasar'), max_length=255)
+    item_stock = models.PositiveIntegerField(_('Stok Awal'))
+    item_income = models.PositiveIntegerField(_('Barang Masuk'))
+    item_outcome = models.PositiveIntegerField(_('Penjualan'))
+    item_last_stock = models.PositiveIntegerField(_('Stok Akhir'), blank=True)
+    item_created = models.DateTimeField(_('Created at'), auto_now_add=True)
+    item_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Stok Barang'
+        verbose_name_plural = 'Stok Barang'
+
+    def __str__(self):
+        return self.item_name
+
+    def save(self, *args, **kwargs):
+        if self.item_last_stock is None:
+            self.item_last_stock = self.item_stock + self.item_income - self.item_outcome
+        else:
+            old_item = StockItem.objects.get(item_id=self.item_id)
+            self.item_last_stock = old_item.item_last_stock + self.item_income - self.item_outcome
         return super().save()
