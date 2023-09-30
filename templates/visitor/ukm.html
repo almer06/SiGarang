@@ -28,6 +28,11 @@
                         </span>
                     </a>
                 </div>
+            {% empty %}
+                <div class="text-center text-secondary">
+                    <i class="bi bi-file-earmark-x fs-1"></i>
+                    <h1>Data Tidak Ditemukan</h1>
+                </div>
             {% endfor %}
         </div>
 
