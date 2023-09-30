@@ -21,6 +21,7 @@ urlpatterns = [
     path('agen-lpg/<slug:slug>', views.AgenLPGViewDetail.as_view(), name='agen_detail'),
     path('kios-pupuk/', views.KiosPupukListView.as_view(), name='kios_pupuk'),
     path('kios-pupuk/<slug:slug>', views.KiosPupukDetailView.as_view(), name='kios_pupuk_detail'),
+    path('stok-barang/', views.StockItemListView.as_view(), name='stock_barang'),
     path('export-excel-sembako/', views.export_excel_harga_sembako, name='excel_sembako'),
     path('import-excel-sembako/', views.import_excel_sembako, name='import_sembako'),
     path('export-excel-ukm', views.export_ukm_to_excel, name='excel_ukm'),
@@ -28,6 +29,7 @@ urlpatterns = [
     path('export_pasar_excel', views.ExportPasarToExcel.as_view(), name='export_pasar'),
     path('export_agen_excel', views.ExportAgenLPGToExcel.as_view(), name='export_agen'),
     path('export_kios_pupuk_excel', views.ExportKiosPupukToExcel.as_view(), name='export_kios_pupuk'),
+    path('export_stok_barang_excel', views.ExportStockItemToExcel.as_view(), name='export_stock_barang'),
 
     path('reset_password/', views.PasswordResetViewVisitor.as_view(), name='reset_password'),
     path('reset/<uidb64>/<token>/', views.PasswordResetConfirmViewVisitor.as_view(), name='password_reset_confirm'),

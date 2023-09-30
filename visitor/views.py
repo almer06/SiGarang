@@ -18,7 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 
 from administrator.models import (UKM, IKM, Agenda, Document, UnitGroceries,
-                                  VariantGroceries, Market, KiosPupuk, AgenLPG)
+                                  VariantGroceries, Market, KiosPupuk, AgenLPG, StockItem)
 from visitor.forms import CustomUserCreationForm, SendInBluePasswordResetForm
 from visitor.models import User
 from visitor.tokens import activation_account
@@ -696,6 +696,53 @@ class ExportKiosPupukToExcel(LoginRequiredMixin, View):
 
         tanggal = datetime.now().strftime("%d/%B/%Y")
         name_excel = f"Data_KiosData_{tanggal}"
+
+        # Buat response HTTP dengan file Excel
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="{name_excel}.xlsx"'
+
+        # Tulis data DataFrame ke file Excel
+        df.to_excel(response, index=False, engine='openpyxl')
+
+        return response
+
+
+class StockItemListView(ListView):
+    model = StockItem
+    template_name = 'visitor/stock_item.html'
+    extra_context = {
+        'title': 'Stok Barang'
+    }
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        name_filter = self.request.GET.get('name')
+        if name_filter:
+            queryset = queryset.filter(item_name__icontains=name_filter)
+        return queryset
+
+
+class ExportStockItemToExcel(LoginRequiredMixin, View):
+    def get(self, request):
+        # Query semua data dari model IKM
+        stock_data = StockItem.objects.all()
+
+        # Buat DataFrame dari data IKM
+        data = {
+            'No': [index + 1 for index in range(0, stock_data.count())],
+            'Nama Barang': [stock.item_name for stock in stock_data],
+            'Nama Pasar': [stock.item_market for stock in stock_data],
+            'Stok Awal': [stock.item_stock for stock in stock_data],
+            'Barang Masuk': [stock.item_income for stock in stock_data],
+            'Penjualan': [stock.item_outcome for stock in stock_data],
+            'Stok Akhir': [stock.item_last_stock for stock in stock_data],
+        }
+
+        df = pd.DataFrame(data)
+
+        tanggal = datetime.now().strftime("%d/%B/%Y")
+        name_excel = f"Data_StokBarang_{tanggal}"
 
         # Buat response HTTP dengan file Excel
         response = HttpResponse(content_type='application/ms-excel')

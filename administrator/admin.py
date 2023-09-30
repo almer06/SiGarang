@@ -1,6 +1,6 @@
 from django.contrib import admin
 from administrator.models import (Agenda, UKM, IKM, Document, UnitGroceries,
-                                  VariantGroceries, Market, AgenLPG, KiosPupuk)
+                                  VariantGroceries, Market, AgenLPG, KiosPupuk, StockItem)
 from django.urls import path
 from django.shortcuts import render
 
@@ -108,3 +108,13 @@ class KiosPupukAdmin(admin.ModelAdmin):
     list_per_page = 10
     ordering = ['-kios_created']
     exclude = ['kios_slug']
+
+
+@admin.register(StockItem)
+class StockItemAdmin(admin.ModelAdmin):
+    list_per_page = 10
+    ordering = ['-item_created']
+    exclude = ['item_slug']
+    list_display = ['item_name', 'item_market', 'item_last_stock']
+    search_fields = ['item_name', 'item_market']
+    readonly_fields = ['item_last_stock']

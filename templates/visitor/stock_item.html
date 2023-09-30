@@ -1,0 +1,107 @@
+{% extends 'visitor/layouts/base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container mb-5">
+        <h1 class="text-success text-center text-uppercase mb-4">Agenda</h1>
+        <form method="get">
+            <div class="row">
+                <div class="col-12 col-sm-6 col-lg-4 mb-3">
+                    <input type="text" autocomplete="off" value="{{ request.GET.name }}" name="name" class="form-control" placeholder="Cari Nama Barang" aria-label="Cari Nama Barang">
+                </div>
+                <div class="col-12 col-sm-6 col-lg-4 mb-3">
+                    <button class="btn btn-primary px-4">Cari</button>
+                    <a href="{% url 'visitor:export_stock_barang' %}" class="btn btn-success px-4">Export Excel</a>
+                </div>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-success">
+                <tr>
+                    <th class="text-center align-middle text-nowrap">No</th>
+                    <th class="text-center align-middle text-nowrap">Nama Barang</th>
+                    <th class="text-center align-middle text-nowrap">Nama Pasar</th>
+                    <th class="text-center align-middle text-nowrap">Stok Awal</th>
+                    <th class="text-center align-middle text-nowrap">Barang Masuk</th>
+                    <th class="text-center align-middle text-nowrap">Penjualan</th>
+                    <th class="text-center align-middle text-nowrap">Stok Akhir</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for object in object_list %}
+                    <tr>
+                        <th>{{ forloop.counter0|add:page_obj.start_index }}</th>
+                        <th>{{ object.item_name }}</th>
+                        <th>{{ object.item_market }}</th>
+                        <th class="text-center">{{ object.item_stock}}</th>
+                        <th class="text-center">{{ object.item_income }}</th>
+                        <th class="text-center">{{ object.item_outcome }}</th>
+                        <th class="text-center">{{ object.item_last_stock }}</th>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <th colspan="5" class="text-center">Data tidak ditemukan</th>
+                    </tr>
+                {% endfor %}
+
+
+                </tbody>
+            </table>
+        </div>
+
+        {% if is_paginated %}
+            <nav aria-label="Page navigation agenda">
+                <ul class="pagination justify-content-end">
+                    <li class="page-item {% if not page_obj.has_previous %} disabled {% endif %}">
+                        <a class="page-link" href="?name={{ request.GET.name|urlencode }}&page=1" aria-label="Previous">
+                            <i class="bi bi-chevron-double-left" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?name={{ request.GET.name|urlencode }}&page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="?name={{ request.GET.name|urlencode }}&page=1" aria-label="Previous">
+                                <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                     {% endif %}
+
+
+                    <li class="page-item">
+                        <span class="page-link">
+                            {{ page_obj.number }} of {{ paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?name={{ request.GET.name|urlencode }}&page={{ page_obj.next_page_number }}" aria-label="Next">
+                                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="?name={{ request.GET.name|urlencode }}&page={{ paginator.num_pages }}" aria-label="Next">
+                                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li class="page-item {% if not page_obj.has_next %} disabled {% endif %} ">
+                        <a class="page-link" href="?name={{ request.GET.name|urlencode }}&page={{ paginator.num_pages }}" aria-label="Next">
+                            <i class="bi bi-chevron-double-right" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+
+
+{% endblock %}
