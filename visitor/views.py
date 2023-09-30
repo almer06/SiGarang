@@ -483,7 +483,7 @@ def check_format_excel(data_frame: pd.DataFrame):
 
 def export_ukm_to_excel(request):
     tanggal = datetime.now().strftime("%d/%B/%Y")
-    name_excel = f"harga_sembako_{tanggal}"
+    name_excel = f"UKM_{tanggal}"
 
     # Query data dari model UKM
     ukm_data = UKM.objects.all()
