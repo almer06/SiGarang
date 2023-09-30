@@ -107,3 +107,4 @@ class AgenLPGAdmin(admin.ModelAdmin):
 class KiosPupukAdmin(admin.ModelAdmin):
     list_per_page = 10
     ordering = ['-kios_created']
+    exclude = ['kios_slug']

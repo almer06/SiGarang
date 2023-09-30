@@ -648,3 +648,60 @@ class ExportAgenLPGToExcel(LoginRequiredMixin, View):
         df.to_excel(response, index=False, engine='openpyxl')
 
         return response
+
+
+class KiosPupukListView(ListView):
+    model = KiosPupuk
+    template_name = 'visitor/kios_pupuk.html'
+    paginate_by = 12
+    extra_context = {
+        'title': 'Kios Pupuk'
+    }
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        name_filter = self.request.GET.get('name')
+        if name_filter:
+            queryset = queryset.filter(kios_name__icontains=name_filter)
+        return queryset
+
+
+class KiosPupukDetailView(DetailView):
+    model = KiosPupuk
+    template_name = 'visitor/kios_pupuk_detail.html'
+    slug_field = 'kios_slug'
+    extra_context: dict = {}
+
+    def get(self, request, *args, **kwargs):
+        self.extra_context.update({'title': kwargs.get('slug')})
+        return super().get(request)
+
+
+class ExportKiosPupukToExcel(LoginRequiredMixin, View):
+    def get(self, request):
+        # Query semua data dari model IKM
+        kios_data = KiosPupuk.objects.all()
+
+        # Buat DataFrame dari data IKM
+        data = {
+            'No': [index + 1 for index in range(0, kios_data.count())],
+            'Nama Kios': [kios.kios_name for kios in kios_data],
+            'Alamat Kios': [kios.kios_address for kios in kios_data],
+            'Nomor Telepon': [kios.kios_number_phone for kios in kios_data],
+            'Nama Distributor': [kios.kios_distributor for kios in kios_data],
+            'Alamat Distributor': [kios.kios_distributor_address for kios in kios_data],
+        }
+
+        df = pd.DataFrame(data)
+
+        tanggal = datetime.now().strftime("%d/%B/%Y")
+        name_excel = f"Data_KiosData_{tanggal}"
+
+        # Buat response HTTP dengan file Excel
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="{name_excel}.xlsx"'
+
+        # Tulis data DataFrame ke file Excel
+        df.to_excel(response, index=False, engine='openpyxl')
+
+        return response
