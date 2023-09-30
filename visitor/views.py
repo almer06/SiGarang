@@ -490,6 +490,7 @@ def export_ukm_to_excel(request):
 
     # Buat dataframe dari data model
     data = {
+        'No': [ukm + 1 for ukm in range(0, ukm_data.count())],
         'Name': [ukm.ukm_name for ukm in ukm_data],
         'Owner': [ukm.ukm_owner for ukm in ukm_data],
         'Number Phone': [ukm.ukm_number_phone for ukm in ukm_data],
@@ -500,40 +501,6 @@ def export_ukm_to_excel(request):
         'Description': [ukm.ukm_description for ukm in ukm_data],
         'Website': [ukm.ukm_website for ukm in ukm_data],
         'Social Media': [ukm.ukm_social_media for ukm in ukm_data],
-    }
-
-    # Buat DataFrame dari data
-    df = pd.DataFrame(data)
-
-    # Buat response Excel
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = f'fattachment; filename="{name_excel}.xlsx"'
-
-    # Tulis data DataFrame ke response
-    df.to_excel(response, index=False)
-
-    return response
-
-
-def export_excel_ikm(request):
-    tanggal = datetime.now().strftime("%d/%B/%Y")
-    name_excel = f"harga_sembako_{tanggal}"
-
-    # Query data dari model UKM
-    ikm_data = IKM.objects.all()
-
-    # Buat dataframe dari data model
-    data = {
-        'Name': [ukm.ukm_name for ukm in ikm_data],
-        'Owner': [ukm.ukm_owner for ukm in ikm_data],
-        'Number Phone': [ukm.ukm_number_phone for ukm in ikm_data],
-        'Legality': [ukm.ukm_legality for ukm in ikm_data],
-        'Type of Product': [ukm.ukm_types_product for ukm in ikm_data],
-        'Outlet': [ukm.ukm_outlet for ukm in ikm_data],
-        'Address': [ukm.ukm_address for ukm in ikm_data],
-        'Description': [ukm.ukm_description for ukm in ikm_data],
-        'Website': [ukm.ukm_website for ukm in ikm_data],
-        'Social Media': [ukm.ukm_social_media for ukm in ikm_data],
     }
 
     # Buat DataFrame dari data
