@@ -523,7 +523,7 @@ class ExportIKMToExcel(LoginRequiredMixin, View):
 
         # Buat DataFrame dari data IKM
         data = {
-            'No': [ikm+1 for ikm in range(0, ikm_data.count())],
+            'No': [ikm + 1 for ikm in range(0, ikm_data.count())],
             'Name': [ikm.ikm_name for ikm in ikm_data],
             'Owner': [ikm.ikm_owner for ikm in ikm_data],
             'Phone Number': [ikm.ikm_number_phone for ikm in ikm_data],
@@ -573,15 +573,72 @@ class ExportPasarToExcel(LoginRequiredMixin, View):
 
         # Buat DataFrame dari data IKM
         data = {
-            'No': [index+1 for index in range(0, market_data.count())],
+            'No': [index + 1 for index in range(0, market_data.count())],
             'Nama Pasar': [market.market_name for market in market_data],
-            'Alamat Pasar': [market.market_address for  market in market_data]
+            'Alamat Pasar': [market.market_address for market in market_data]
         }
 
         df = pd.DataFrame(data)
 
         tanggal = datetime.now().strftime("%d/%B/%Y")
         name_excel = f"Data_Pasar_{tanggal}"
+
+        # Buat response HTTP dengan file Excel
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="{name_excel}.xlsx"'
+
+        # Tulis data DataFrame ke file Excel
+        df.to_excel(response, index=False, engine='openpyxl')
+
+        return response
+
+
+class AgenLPGView(ListView):
+    template_name = 'visitor/agen_lpg.html'
+    model = AgenLPG
+    paginate_by = 12
+    extra_context = {
+        'title': 'Agen LPG'
+    }
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        name_filter = self.request.GET.get('name')
+        if name_filter:
+            queryset = queryset.filter(agen_name__icontains=name_filter)
+        return queryset
+
+
+class AgenLPGViewDetail(DetailView):
+    model = AgenLPG
+    template_name = 'visitor/agen-detail.html'
+    slug_field = 'agen_slug'
+    extra_context: dict = {}
+
+    def get(self, request, *args, **kwargs):
+        self.extra_context.update({'title': kwargs.get('slug')})
+        return super().get(request)
+
+
+class ExportAgenLPGToExcel(LoginRequiredMixin, View):
+    def get(self, request):
+        # Query semua data dari model IKM
+        agen_data = AgenLPG.objects.all()
+
+        # Buat DataFrame dari data IKM
+        data = {
+            'No': [index + 1 for index in range(0, agen_data.count())],
+            'Nama Agen': [agen.agen_name for agen in agen_data],
+            'Alamat Agen': [agen.agen_address for agen in agen_data],
+            'Nama Pangkalan': [agen.agen_base_name for agen in agen_data],
+            'Alamat Pangkalan': [agen.agen_base_address for agen in agen_data],
+            'Nomor Telepon': [agen.agen_number_phone for agen in agen_data],
+        }
+
+        df = pd.DataFrame(data)
+
+        tanggal = datetime.now().strftime("%d/%B/%Y")
+        name_excel = f"Data_AgenLPG_{tanggal}"
 
         # Buat response HTTP dengan file Excel
         response = HttpResponse(content_type='application/ms-excel')

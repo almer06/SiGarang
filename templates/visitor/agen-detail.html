@@ -1,0 +1,39 @@
+{% extends 'visitor/layouts/base.html' %}
+{% load static %}
+
+{% block hero %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="container-md mt-5">
+        <img src="{{ object.agen_image.url }}" alt="Image UKM" class="d-block mx-auto ukm-image">
+
+        <div class="table-responsive mt-5">
+            <table class="table table-borderless table-hover">
+                <tbody>
+                    <tr>
+                        <td class="text-nowrap">Nama Agen</td>
+                        <td>{{ object.agen_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Alamat Agen</td>
+                        <td>{{ object.agen_address }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Nama Pangkalan</td>
+                        <td>{{ object.agen_base_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Alamat Pangkalan</td>
+                        <td>{{ object.agen_base_address }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Nomor Telepon</td>
+                        <td>{{ object.agen_number_phone }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
