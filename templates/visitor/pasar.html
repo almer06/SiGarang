@@ -1,0 +1,54 @@
+{% extends 'visitor/layouts/base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="text-success text-center text-uppercase">Pasar</h1>
+
+        <form method="get">
+            <div class="row">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="name"
+                               placeholder="Cari Nama Pasar" value="{{ request.GET.name_market }}" name="name_market">
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <button type="submit" class="btn btn-primary px-4 mb-3">Cari</button>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'visitor:export_pasar' %}" class="btn btn-success px-4 mb-3">Export Excel</a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-success">
+                <tr>
+                    <th class="text-center align-middle" style="width: 3rem">No</th>
+                    <th class="text-center align-middle">Nama Pasar</th>
+                    <th class="text-center align-middle">Alamat</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for object in object_list %}
+                    <tr>
+                        <th class="text-center">{{ forloop.counter }}</th>
+                        <th>{{ object.market_name }}</th>
+                        <th>{{ object.market_address }}</th>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <th colspan="4" class="text-center">Data tidak ditemukan</th>
+                    </tr>
+                {% endfor %}
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

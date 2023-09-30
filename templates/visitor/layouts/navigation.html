@@ -1,5 +1,5 @@
 {% load static %}
-<nav class="navbar navbar-expand-lg bg-success navbar-dark">
+<nav class="navbar fixed-top navbar-expand-lg bg-success navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand d-none d-sm-flex align-items-center gap-2" href="{% url 'visitor:harga_sembako' %}">
             <img src="{% static 'images/logo.png' %}" alt="logo bener meriah" width="30">
@@ -48,12 +48,24 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li><a class="dropdown-item" href="{% url 'visitor:ikm' %}">IKM</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="{% url 'visitor:pasar' %}">DATA PASAR</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="{% url 'visitor:agen_lpg' %}">AGEN LPG</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="{% url 'visitor:kios_pupuk' %}">KIOS PUPUK</a></li>
                     </ul>
                 </li>
             </ul>
             <ul class="navbar-nav d-flex align-items-center" style="column-gap: 8px">
                 {% if request.user.is_authenticated %}
-                    <a class="dropdown-item text-white d-none d-lg-block">{{ user }}</a>
+                    <p class="dropdown-item text-white d-none d-lg-block m-0">{{ user }}</p>
                     <div class="dropdown d-none d-lg-block">
                         <i class="bi bi-person-circle text-white fs-3" style="cursor: pointer;" data-bs-display="static"
                            aria-expanded="false" data-bs-toggle="dropdown"></i>

@@ -17,7 +17,8 @@ from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 
-from administrator.models import UKM, IKM, Agenda, Document, UnitGroceries, VariantGroceries
+from administrator.models import (UKM, IKM, Agenda, Document, UnitGroceries,
+                                  VariantGroceries, Market, KiosPupuk, AgenLPG)
 from visitor.forms import CustomUserCreationForm, SendInBluePasswordResetForm
 from visitor.models import User
 from visitor.tokens import activation_account
@@ -465,11 +466,6 @@ def import_excel_sembako(request):
     })
 
 
-# def check_format_excel(tipe: list) -> bool:
-#     valid_tipe: list = [str, str, int, int]
-#
-#     return tipe == valid_tipe
-
 def check_format_excel(data_frame: pd.DataFrame):
     valid_tipe: list = [str, str, int, int]
 
@@ -483,3 +479,229 @@ def check_format_excel(data_frame: pd.DataFrame):
             return valid
 
     return True
+
+
+def export_ukm_to_excel(request):
+    tanggal = datetime.now().strftime("%d/%B/%Y")
+    name_excel = f"harga_sembako_{tanggal}"
+
+    # Query data dari model UKM
+    ukm_data = UKM.objects.all()
+
+    # Buat dataframe dari data model
+    data = {
+        'No': [ukm + 1 for ukm in range(0, ukm_data.count())],
+        'Name': [ukm.ukm_name for ukm in ukm_data],
+        'Owner': [ukm.ukm_owner for ukm in ukm_data],
+        'Number Phone': [ukm.ukm_number_phone for ukm in ukm_data],
+        'Legality': [ukm.ukm_legality for ukm in ukm_data],
+        'Type of Product': [ukm.ukm_types_product for ukm in ukm_data],
+        'Outlet': [ukm.ukm_outlet for ukm in ukm_data],
+        'Address': [ukm.ukm_address for ukm in ukm_data],
+        'Description': [ukm.ukm_description for ukm in ukm_data],
+        'Website': [ukm.ukm_website for ukm in ukm_data],
+        'Social Media': [ukm.ukm_social_media for ukm in ukm_data],
+    }
+
+    # Buat DataFrame dari data
+    df = pd.DataFrame(data)
+
+    # Buat response Excel
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'fattachment; filename="{name_excel}.xlsx"'
+
+    # Tulis data DataFrame ke response
+    df.to_excel(response, index=False)
+
+    return response
+
+
+class ExportIKMToExcel(LoginRequiredMixin, View):
+    def get(self, request):
+        # Query semua data dari model IKM
+        ikm_data = IKM.objects.all()
+
+        # Buat DataFrame dari data IKM
+        data = {
+            'No': [ikm + 1 for ikm in range(0, ikm_data.count())],
+            'Name': [ikm.ikm_name for ikm in ikm_data],
+            'Owner': [ikm.ikm_owner for ikm in ikm_data],
+            'Phone Number': [ikm.ikm_number_phone for ikm in ikm_data],
+            'Legality': [ikm.ikm_legality for ikm in ikm_data],
+            'Type of Product': [ikm.ikm_types_product for ikm in ikm_data],
+            'Outlet': [ikm.ikm_outlet for ikm in ikm_data],
+            'Address': [ikm.ikm_address for ikm in ikm_data],
+            'Description': [ikm.ikm_description for ikm in ikm_data],
+            'Website': [ikm.ikm_website for ikm in ikm_data],
+            'Social Media': [ikm.ikm_social_media for ikm in ikm_data],
+        }
+
+        df = pd.DataFrame(data)
+
+        tanggal = datetime.now().strftime("%d/%B/%Y")
+        name_excel = f"Data_IKM_{tanggal}"
+
+        # Buat response HTTP dengan file Excel
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="{name_excel}.xlsx"'
+
+        # Tulis data DataFrame ke file Excel
+        df.to_excel(response, index=False, engine='openpyxl')
+
+        return response
+
+
+class PasarView(ListView):
+    model = Market
+    template_name = 'visitor/pasar.html'
+    extra_context = {
+        'title': 'Pasar'
+    }
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        name_filter = self.request.GET.get('name_market')
+        if name_filter:
+            queryset = queryset.filter(market_name__icontains=name_filter)
+        return queryset
+
+
+class ExportPasarToExcel(LoginRequiredMixin, View):
+    def get(self, request):
+        # Query semua data dari model IKM
+        market_data = Market.objects.all()
+
+        # Buat DataFrame dari data IKM
+        data = {
+            'No': [index + 1 for index in range(0, market_data.count())],
+            'Nama Pasar': [market.market_name for market in market_data],
+            'Alamat Pasar': [market.market_address for market in market_data]
+        }
+
+        df = pd.DataFrame(data)
+
+        tanggal = datetime.now().strftime("%d/%B/%Y")
+        name_excel = f"Data_Pasar_{tanggal}"
+
+        # Buat response HTTP dengan file Excel
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="{name_excel}.xlsx"'
+
+        # Tulis data DataFrame ke file Excel
+        df.to_excel(response, index=False, engine='openpyxl')
+
+        return response
+
+
+class AgenLPGView(ListView):
+    template_name = 'visitor/agen_lpg.html'
+    model = AgenLPG
+    paginate_by = 12
+    extra_context = {
+        'title': 'Agen LPG'
+    }
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        name_filter = self.request.GET.get('name')
+        if name_filter:
+            queryset = queryset.filter(agen_name__icontains=name_filter)
+        return queryset
+
+
+class AgenLPGViewDetail(DetailView):
+    model = AgenLPG
+    template_name = 'visitor/agen-detail.html'
+    slug_field = 'agen_slug'
+    extra_context: dict = {}
+
+    def get(self, request, *args, **kwargs):
+        self.extra_context.update({'title': kwargs.get('slug')})
+        return super().get(request)
+
+
+class ExportAgenLPGToExcel(LoginRequiredMixin, View):
+    def get(self, request):
+        # Query semua data dari model IKM
+        agen_data = AgenLPG.objects.all()
+
+        # Buat DataFrame dari data IKM
+        data = {
+            'No': [index + 1 for index in range(0, agen_data.count())],
+            'Nama Agen': [agen.agen_name for agen in agen_data],
+            'Alamat Agen': [agen.agen_address for agen in agen_data],
+            'Nama Pangkalan': [agen.agen_base_name for agen in agen_data],
+            'Alamat Pangkalan': [agen.agen_base_address for agen in agen_data],
+            'Nomor Telepon': [agen.agen_number_phone for agen in agen_data],
+        }
+
+        df = pd.DataFrame(data)
+
+        tanggal = datetime.now().strftime("%d/%B/%Y")
+        name_excel = f"Data_AgenLPG_{tanggal}"
+
+        # Buat response HTTP dengan file Excel
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="{name_excel}.xlsx"'
+
+        # Tulis data DataFrame ke file Excel
+        df.to_excel(response, index=False, engine='openpyxl')
+
+        return response
+
+
+class KiosPupukListView(ListView):
+    model = KiosPupuk
+    template_name = 'visitor/kios_pupuk.html'
+    paginate_by = 12
+    extra_context = {
+        'title': 'Kios Pupuk'
+    }
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        name_filter = self.request.GET.get('name')
+        if name_filter:
+            queryset = queryset.filter(kios_name__icontains=name_filter)
+        return queryset
+
+
+class KiosPupukDetailView(DetailView):
+    model = KiosPupuk
+    template_name = 'visitor/kios_pupuk_detail.html'
+    slug_field = 'kios_slug'
+    extra_context: dict = {}
+
+    def get(self, request, *args, **kwargs):
+        self.extra_context.update({'title': kwargs.get('slug')})
+        return super().get(request)
+
+
+class ExportKiosPupukToExcel(LoginRequiredMixin, View):
+    def get(self, request):
+        # Query semua data dari model IKM
+        kios_data = KiosPupuk.objects.all()
+
+        # Buat DataFrame dari data IKM
+        data = {
+            'No': [index + 1 for index in range(0, kios_data.count())],
+            'Nama Kios': [kios.kios_name for kios in kios_data],
+            'Alamat Kios': [kios.kios_address for kios in kios_data],
+            'Nomor Telepon': [kios.kios_number_phone for kios in kios_data],
+            'Nama Distributor': [kios.kios_distributor for kios in kios_data],
+            'Alamat Distributor': [kios.kios_distributor_address for kios in kios_data],
+        }
+
+        df = pd.DataFrame(data)
+
+        tanggal = datetime.now().strftime("%d/%B/%Y")
+        name_excel = f"Data_KiosData_{tanggal}"
+
+        # Buat response HTTP dengan file Excel
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="{name_excel}.xlsx"'
+
+        # Tulis data DataFrame ke file Excel
+        df.to_excel(response, index=False, engine='openpyxl')
+
+        return response

@@ -1,0 +1,39 @@
+{% extends 'visitor/layouts/base.html' %}
+{% load static %}
+
+{% block hero %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="container-md mt-5">
+        <img src="{{ object.kios_image.url }}" alt="Image Kios Pupuk" class="d-block mx-auto ikm-image">
+
+        <div class="table-responsive mt-5">
+            <table class="table table-borderless table-hover">
+                <tbody>
+                    <tr>
+                        <td class="text-nowrap">Nama Kios</td>
+                        <td>{{ object.kios_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Alamat Kios</td>
+                        <td>{{ object.kios_address }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Nomor Telepon</td>
+                        <td>{{ object.kios_number_phone }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Nama Distributor</td>
+                        <td>{{ object.kios_distributor }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-nowrap">Alamat Distributor</td>
+                        <td>{{ object.kios_distributor_address }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

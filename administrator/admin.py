@@ -1,5 +1,6 @@
 from django.contrib import admin
-from administrator.models import Agenda, UKM, IKM, Document, UnitGroceries, VariantGroceries
+from administrator.models import (Agenda, UKM, IKM, Document, UnitGroceries,
+                                  VariantGroceries, Market, AgenLPG, KiosPupuk)
 from django.urls import path
 from django.shortcuts import render
 
@@ -84,3 +85,26 @@ class VariantGroceriesAdmin(admin.ModelAdmin):
     ordering = ['-groceries_created']
     search_fields = ('groceries_name',)
     list_per_page = 10
+
+
+@admin.register(Market)
+class MarketAdmin(admin.ModelAdmin):
+    list_per_page = 10
+    ordering = ['-market_created']
+    search_fields = ('market_name',)
+    fields = ['market_name', 'market_address']
+
+
+@admin.register(AgenLPG)
+class AgenLPGAdmin(admin.ModelAdmin):
+    list_per_page = 10
+    ordering = ['-agen_created']
+    search_fields = ('agen_name',)
+    exclude = ['agen_slug']
+
+
+@admin.register(KiosPupuk)
+class KiosPupukAdmin(admin.ModelAdmin):
+    list_per_page = 10
+    ordering = ['-kios_created']
+    exclude = ['kios_slug']

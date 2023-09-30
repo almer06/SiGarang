@@ -126,7 +126,7 @@ class Document(models.Model):
     document_sector = models.CharField(_('Sector'), unique=True, max_length=255)
     document_detail = models.TextField(_('Detail'))
     document_file = models.FileField(_('File'), upload_to='file/')
-    document_created = models.DateTimeField(_('Crated at'), auto_now_add=True)
+    document_created = models.DateTimeField(_('Created at'), auto_now_add=True)
     document_updated = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -139,3 +139,71 @@ class Document(models.Model):
     def delete(self, **kwargs):
         self.document_file.delete()
         super().delete()
+
+
+class AgenLPG(models.Model):
+    agen_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    agen_name = models.CharField(_('Nama Agen'), max_length=255, unique=True)
+    agen_slug = models.SlugField(_('Slug'), max_length=255, blank=True)
+    agen_address = models.TextField(_('Alamat Agen'))
+    agen_number_phone = models.CharField(_('Nomor Telepon'), max_length=15)
+    agen_base_name = models.CharField(_('Nama Pangkalan'), max_length=255, unique=True)
+    agen_base_address = models.TextField(_('Alamat Pangkalan'))
+    agen_image = models.ImageField(_('Image'), upload_to='images/agen/')
+    agen_created = models.DateTimeField(_('Created at'), auto_now_add=True)
+    agen_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Agen LPG'
+        verbose_name_plural = 'Agen LPG'
+
+    def __str__(self):
+        return f"{self.agen_name}"
+
+    def save(self, **kwargs):
+        self.agen_slug = slugify(self.agen_name)
+        return super().save()
+
+
+class KiosPupuk(models.Model):
+    kios_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    kios_name = models.CharField(_('Nama Kios'), max_length=255, unique=True)
+    kios_address = models.TextField(_('Alamat Kios'))
+    kios_slug = models.SlugField(_('Slug'), max_length=255, blank=True)
+    kios_number_phone = models.CharField(_('Nomor Telepon'), max_length=15)
+    kios_distributor = models.CharField(_('Nama Distributor'), max_length=255, unique=True)
+    kios_distributor_address = models.TextField(_('Alamat Distibutor'))
+    kios_image = models.ImageField(_('Gambar'), upload_to='images/kios/')
+    kios_created = models.DateTimeField(_('Created at'), auto_now_add=True)
+    kios_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Kios Pupuk'
+        verbose_name_plural = 'Kios Pupuk'
+
+    def __str__(self):
+        return f"{self.kios_name}"
+
+    def save(self, **kwargs):
+        self.kios_slug = slugify(self.kios_name)
+        return super().save()
+
+
+class Market(models.Model):
+    market_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    market_name = models.CharField(_('Nama Pasar'), max_length=255, unique=True)
+    market_address = models.TextField(_('Alamat Pasar'))
+    market_slug = models.SlugField(_('Slug'), max_length=255, blank=True)
+    market_created = models.DateTimeField(_('Created at'), auto_now_add=True)
+    market_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Pasar'
+        verbose_name_plural = 'Pasar'
+
+    def __str__(self):
+        return f"{self.market_name}"
+
+    def save(self, **kwargs):
+        self.market_slug = slugify(self.market_name)
+        return super().save()
