@@ -85,6 +85,7 @@ class VariantGroceriesAdmin(admin.ModelAdmin):
     ordering = ['-groceries_created']
     search_fields = ('groceries_name',)
     list_per_page = 10
+    list_display = ['groceries_name', 'groceries_quantity', 'groceries_massa']
 
 
 @admin.register(Market)

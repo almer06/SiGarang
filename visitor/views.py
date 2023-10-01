@@ -261,7 +261,8 @@ def sembako(request):
     create_day = request.GET.get('create')
 
     if id_sembako is None and create_day is None:
-        query = VariantGroceries.objects.all().values('groceries_id', 'groceries_name').order_by('-groceries_created')
+        query = VariantGroceries.objects.all().values('groceries_id', 'groceries_name', 'groceries_massa',
+                                                      'groceries_quantity').order_by('-groceries_created')
 
         return JsonResponse(
             {
@@ -300,7 +301,7 @@ def sembako(request):
 
     query = UnitGroceries.objects.filter(unit_groceries_variant__groceries_id=id_sembako) \
         .filter(unit_groceries_created=day) \
-        .values('unit_groceries_massa', 'unit_groceries_price', 'unit_groceries_quantity')
+        .values('unit_groceries_price', )
 
     return JsonResponse(
         {
@@ -440,25 +441,18 @@ def import_excel_sembako(request):
         }, status=400)
 
     for index, row in df.iterrows():
-        obj, created = VariantGroceries.objects.get_or_create(groceries_name=row[0])
-
+        obj, created = VariantGroceries.objects.get_or_create(groceries_name=row[0],
+                                                              defaults={
+                                                                'groceries_massa': row[1],
+                                                                'groceries_quantity': row[2],
+                                                              })
         UnitGroceries.objects.update_or_create(
             unit_groceries_variant_id=obj.pk,
             unit_groceries_created=tanggal,
             defaults={
-                "unit_groceries_massa": row[1],
-                "unit_groceries_quantity": row[2],
                 "unit_groceries_price": row[3],
             }
         )
-
-        # UnitGroceries.objects.create(
-        #     unit_groceries_variant_id=obj.pk,
-        #     unit_groceries_massa=row[1],
-        #     unit_groceries_quantity=row[2],
-        #     unit_groceries_price=row[3],
-        #     unit_groceries_created=tanggal
-        # )
 
     return JsonResponse({
         'success': True,

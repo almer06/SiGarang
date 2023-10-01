@@ -67,14 +67,10 @@ function detailSembako(sembako, index) {
 
             const item = data[0] || {}
             const price = item.unit_groceries_price || 0
-            const unit = item.unit_groceries_massa || ''
-            const quantity = item.unit_groceries_quantity
 
             price_today[sembako.groceries_name] = price
             renderStatistik(sembako.groceries_name)
 
-            $(`#quantity${index}`).text(quantity)
-            $(`#unit${index}`).text(unit)
             $(`#price${index}`).text(price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'))
         },
     })
@@ -102,8 +98,8 @@ function renderTableBody(data, index) {
         <tr>
             <td class="text-center">${index+1}</td>
             <td>${data.groceries_name}</td>
-            <td id="quantity${index}" class="text-center"></td>
-            <td id="unit${index}" class="text-center"></td>
+            <td id="quantity${index}" class="text-center">${data.groceries_quantity}</td>
+            <td id="unit${index}" class="text-center">${data.groceries_massa}</td>
             <td id="price-yesterday${index}" class="text-center"></td>
             <td id="price${index}" class="text-center"></td>
             <td id="statistic-${data.groceries_name}" class="statistic text-center"></td>

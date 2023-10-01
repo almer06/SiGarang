@@ -91,6 +91,8 @@ class IKM(models.Model):
 class VariantGroceries(models.Model):
     groceries_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     groceries_name = models.CharField(max_length=255, unique=True, verbose_name='Nama Bahan Pokok')
+    groceries_massa = models.CharField(max_length=64, verbose_name='Satuan Bahan Pokok')
+    groceries_quantity = models.PositiveSmallIntegerField(verbose_name='Jumlah Bahan Pokok')
     groceries_created = models.DateTimeField(auto_now_add=True)
     groceries_updated = models.DateTimeField(auto_now=True)
 
@@ -106,9 +108,7 @@ class UnitGroceries(models.Model):
     unit_groceries_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     unit_groceries_variant = models.ForeignKey(VariantGroceries, on_delete=models.CASCADE,
                                                related_name='unit_groceries', verbose_name='Nama Bahan Pokok')
-    unit_groceries_massa = models.CharField(max_length=64, verbose_name='Satuan Bahan Pokok')
     unit_groceries_price = models.PositiveIntegerField(verbose_name='Harga Bahan Pokok')
-    unit_groceries_quantity = models.PositiveSmallIntegerField(verbose_name='Jumlah Bahan Pokok')
     unit_groceries_created = models.DateField(verbose_name='Hari')
     unit_groceries_updated = models.DateTimeField(auto_now=True)
 
