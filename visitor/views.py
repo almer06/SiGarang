@@ -327,11 +327,15 @@ def export_excel_harga_sembako(request):
     massa = (VariantGroceries.objects.all()
              .order_by('-groceries_created')
              .values_list('groceries_massa', flat=True))
+    quantity = (VariantGroceries.objects.all()
+                .order_by('-groceries_created')
+                .values_list('groceries_quantity', flat=True))
     harga_hari_ini = sql_harga_hari_ini()
     harga_kemarin = sql_harga_kemarin()
 
     data = {
         'Nama Sembako': list(name_sembako),
+        'Kuantitas': list(quantity),
         'Satuan': massa,
         'Harga Hari Ini': harga_hari_ini['price'],
         'Harga Kemarin': harga_kemarin
