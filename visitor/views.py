@@ -321,15 +321,10 @@ def export_excel_harga_sembako(request):
         headers={"Content-Disposition": f'attachment; filename="{name_excel}.xlsx"'},
     )
 
-    name_sembako = (VariantGroceries.objects.all()
-                    .order_by('-groceries_created')
-                    .values_list('groceries_name', flat=True))
-    massa = (VariantGroceries.objects.all()
-             .order_by('-groceries_created')
-             .values_list('groceries_massa', flat=True))
-    quantity = (VariantGroceries.objects.all()
-                .order_by('-groceries_created')
-                .values_list('groceries_quantity', flat=True))
+    variant_groceries = VariantGroceries.objects.all().order_by('-groceries_created')
+    name_sembako = variant_groceries.values_list('groceries_name', flat=True)
+    massa = variant_groceries.values_list('groceries_massa', flat=True)
+    quantity = variant_groceries.values_list('groceries_quantity', flat=True)
     harga_hari_ini = sql_harga_hari_ini()
     harga_kemarin = sql_harga_kemarin()
 
