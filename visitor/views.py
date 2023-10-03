@@ -324,12 +324,15 @@ def export_excel_harga_sembako(request):
     name_sembako = (VariantGroceries.objects.all()
                     .order_by('-groceries_created')
                     .values_list('groceries_name', flat=True))
+    massa = (VariantGroceries.objects.all()
+             .order_by('-groceries_created')
+             .values_list('groceries_massa', flat=True))
     harga_hari_ini = sql_harga_hari_ini()
     harga_kemarin = sql_harga_kemarin()
 
     data = {
         'Nama Sembako': list(name_sembako),
-        'Satuan': harga_hari_ini['massa'],
+        'Satuan': massa,
         'Harga Hari Ini': harga_hari_ini['price'],
         'Harga Kemarin': harga_kemarin
     }
@@ -353,16 +356,16 @@ def export_excel_harga_sembako(request):
 def sql_harga_hari_ini() -> dict:
     raw_query = """
     SELECT
-        groceries_name, COALESCE(unit_groceries_massa, ''), COALESCE(unit_groceries_price, 0) as price
+        groceries_name, COALESCE(unit_groceries_price, 0) as price
     FROM
         administrator_variantgroceries av
     LEFT JOIN (
         SELECT
-            unit_groceries_variant_id, unit_groceries_massa, MAX(unit_groceries_price) as unit_groceries_price
+            unit_groceries_variant_id, MAX(unit_groceries_price) as unit_groceries_price
         FROM
             administrator_unitgroceries au
         WHERE DATE(au.unit_groceries_created) = CURDATE()
-        GROUP BY unit_groceries_variant_id, unit_groceries_massa
+        GROUP BY unit_groceries_variant_id
         ) administrator_unitgroceries ON unit_groceries_variant_id = av.groceries_id;
     """
 
@@ -372,12 +375,10 @@ def sql_harga_hari_ini() -> dict:
 
     data = {
         'price': [],
-        'massa': []
     }
 
     for row in results:
-        data['massa'].append(row[1])
-        data['price'].append(row[2])
+        data['price'].append(row[1])
 
     return data
 
@@ -443,8 +444,8 @@ def import_excel_sembako(request):
     for index, row in df.iterrows():
         obj, created = VariantGroceries.objects.get_or_create(groceries_name=row[0],
                                                               defaults={
-                                                                'groceries_massa': row[1],
-                                                                'groceries_quantity': row[2],
+                                                                  'groceries_massa': row[1],
+                                                                  'groceries_quantity': row[2],
                                                               })
         UnitGroceries.objects.update_or_create(
             unit_groceries_variant_id=obj.pk,
