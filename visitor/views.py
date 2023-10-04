@@ -259,10 +259,18 @@ class ActivateAccount(View):
 def sembako(request):
     id_sembako = request.GET.get('id_sembako')
     create_day = request.GET.get('create')
+    name = request.GET.get('nama_sembako')
 
     if id_sembako is None and create_day is None:
-        query = VariantGroceries.objects.all().values('groceries_id', 'groceries_name', 'groceries_massa',
-                                                      'groceries_quantity').order_by('-groceries_created')
+        if name:
+            query = VariantGroceries.objects.filter(groceries_name__icontains=name).values('groceries_id',
+                                                                                           'groceries_name',
+                                                                                           'groceries_massa',
+                                                                                           'groceries_quantity').order_by(
+                '-groceries_created')
+        else:
+            query = VariantGroceries.objects.all().values('groceries_id', 'groceries_name', 'groceries_massa',
+                                                          'groceries_quantity').order_by('-groceries_created')
 
         return JsonResponse(
             {
