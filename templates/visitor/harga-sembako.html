@@ -24,21 +24,27 @@
 
 
         <div class="table-responsive">
-        <table class="table table-bordered">
-            <thead class="table-success">
-                <tr>
-                    <th class="text-center">No.</th>
-                    <th class="text-center">Nama Variant</th>
-                    <th class="text-center">Kuantitas</th>
-                    <th class="text-center">Satuan</th>
-                    <th class="text-center">Harga Kemarin</th>
-                    <th class="text-center">Harga Hari ini</th>
-                    <th class="text-center">Statistik</th>
-                </tr>
-            </thead>
-        <tbody id="table-body"></tbody>
-    </table>
-    </div>
+            <table class="table table-bordered">
+                <thead class="table-success">
+                    <tr>
+                        <th class="text-center">No.</th>
+                        <th class="text-center">Nama Variant</th>
+                        <th class="text-center">Kuantitas</th>
+                        <th class="text-center">Satuan</th>
+                        <th class="text-center">Harga Kemarin</th>
+                        <th class="text-center">Harga Hari ini</th>
+                        <th class="text-center">Statistik</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item page-link" id="prev-page">Previous</li>
+                <li class="page-item page-link" id="next-page">Next</li>
+            </ul>
+        </nav>
     </div>
 
 
@@ -49,6 +55,7 @@
 
 $(document).ready(function () {
     let row_data_sembako = []
+    let row_data = []
     const graph_icon = {
         'up': '<i class="bi bi-caret-up-fill text-danger"></i>',
         'equal': '<i class="text-secondary fw-bold">=</i>',
@@ -61,6 +68,7 @@ $(document).ready(function () {
         url: {% url 'visitor:sembako' %},
         success: function (data) {
             row_data_sembako = data.data
+            row_data = data
             row_data_sembako.forEach((item, index) => {
                 $('#table-body').append(renderTableBody(item, index))
                 detailSembako(item, index)
@@ -137,9 +145,12 @@ $(document).ready(function () {
 
     }
 
-    function updateTable(searchTerm) {
+    let currentPage = 1;
+    const itemsPerPage = 10;
+
+    function updateTable(searchTerm, page) {
         $.ajax({
-            url: '{% url "visitor:sembako" %}?nama_sembako=' + encodeURIComponent(searchTerm),
+            url: '{% url "visitor:sembako" %}?nama_sembako=' + encodeURIComponent(searchTerm) + '&page=' + page,
             success: function (data) {
                 row_data_sembako = data.data;
                 $('#table-body').empty(); // Clear the table body before adding new data
@@ -149,9 +160,46 @@ $(document).ready(function () {
                     detailSembako(item, index);
                     detailSembakoYesterday(item, index);
                 });
+
+                currentPage = page;
+                updatePagination(data.total_pages);
             }
         });
     }
+
+    function updatePagination(totalPages) {
+        if (totalPages <= 1) {
+            $('#prev-page').addClass('disabled');
+            $('#next-page').addClass('disabled');
+        } else {
+            $('#prev-page').removeClass('disabled');
+            $('#next-page').removeClass('disabled');
+        }
+
+        if (currentPage === 1) {
+            $('#prev-page').addClass('disabled');
+        } else {
+            $('#prev-page').removeClass('disabled');
+        }
+
+        if (currentPage === totalPages) {
+            $('#next-page').addClass('disabled');
+        } else {
+            $('#next-page').removeClass('disabled');
+        }
+    }
+
+    $('#prev-page').click(function () {
+        if (currentPage > 1) {
+            updateTable($('#search-input').val(), currentPage - 1);
+        }
+    });
+
+    $('#next-page').click(function () {
+        if (currentPage < row_data.total_pages) {
+            updateTable($('#search-input').val(), currentPage + 1);
+        }
+    });
 
     $('#search-button').click(function () {
         const searchTerm = $('#search-input').val();

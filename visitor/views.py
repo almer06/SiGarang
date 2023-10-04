@@ -257,25 +257,36 @@ class ActivateAccount(View):
 
 
 def sembako(request):
+    page = request.GET.get('page')
+    page_size = request.GET.get('page_size', 10)
+
     id_sembako = request.GET.get('id_sembako')
     create_day = request.GET.get('create')
     name = request.GET.get('nama_sembako')
 
     if id_sembako is None and create_day is None:
         if name:
-            query = VariantGroceries.objects.filter(groceries_name__icontains=name).values('groceries_id',
-                                                                                           'groceries_name',
-                                                                                           'groceries_massa',
-                                                                                           'groceries_quantity').order_by(
-                '-groceries_created')
+            query = (VariantGroceries.objects.filter(groceries_name__icontains=name)
+                     .values('groceries_id', 'groceries_name', 'groceries_massa', 'groceries_quantity')
+                     .order_by('-groceries_created'))
         else:
             query = VariantGroceries.objects.all().values('groceries_id', 'groceries_name', 'groceries_massa',
                                                           'groceries_quantity').order_by('-groceries_created')
 
+        # Create a Paginator
+        paginator = Paginator(query, page_size)
+
+        try:
+            paginated_data = paginator.page(page)
+        except Exception as e:
+            paginated_data = paginator.page(1)  # Default to the first page if page is invalid
+
         return JsonResponse(
             {
                 'success': True,
-                'data': list(query)
+                'data': list(paginated_data),
+                'page': paginated_data.number,
+                'total_pages': paginator.num_pages
             }
         )
 
