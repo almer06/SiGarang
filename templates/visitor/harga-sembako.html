@@ -2,6 +2,23 @@
 
 {% block content %}
 
+<style>
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+.cursor-pointer {
+    cursor: pointer;
+}
+</style>
+
     <div class="container">
 
         <h1 class="text-center text-success mb-3">HARGA SEMBAKO</h1>
@@ -9,24 +26,52 @@
             <a href="{% url 'visitor:excel_sembako' %}" class="btn btn-primary mt-4 mb-3">Export Excel</a>
         {% endif %}
 
+        <div class="row">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="search-input"
+                           placeholder="Cari Nama Sembako">
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <button type="submit" id="search-button" class="btn btn-primary px-4 mb-3">Cari</button>
+            </div>
+        </div>
+
 
 
         <div class="table-responsive">
-        <table class="table table-bordered">
-            <thead class="table-success">
-                <tr>
-                    <th class="text-center">No.</th>
-                    <th class="text-center">Nama Variant</th>
-                    <th class="text-center">Kuantitas</th>
-                    <th class="text-center">Satuan</th>
-                    <th class="text-center">Harga Kemarin</th>
-                    <th class="text-center">Harga Hari ini</th>
-                    <th class="text-center">Statistik</th>
-                </tr>
-            </thead>
-        <tbody id="table-body"></tbody>
-    </table>
-    </div>
+            <table class="table table-bordered">
+                <thead class="table-success">
+                    <tr>
+                        <th class="text-center">No.</th>
+                        <th class="text-center">Nama Variant</th>
+                        <th class="text-center">Kuantitas</th>
+                        <th class="text-center">Satuan</th>
+                        <th class="text-center">Harga Kemarin</th>
+                        <th class="text-center">Harga Hari ini</th>
+                        <th class="text-center">Statistik</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-end">
+            <li class="page-item page-link cursor-pointer" id="prev-page">
+                <span aria-hidden="true">&laquo;</span>
+            </li>
+            <li class="page-item ">
+                <input type="number" style="width: 56px" id="pagination-val" class="page-link text-center">
+            </li>
+            <li class="page-item page-link">of</li>
+            <li class="page-item page-link" id="last-page"></li>
+            <li class="page-item page-link cursor-pointer" id="next-page">
+                <span aria-hidden="true">&raquo;</span>
+            </li>
+          </ul>
+        </nav>
+
     </div>
 
 
@@ -35,94 +80,178 @@
 {% block script %}
 <script>
 
-let row_data_sembako = []
-const graph_icon = {
-    'up': '<i class="bi bi-caret-up-fill text-danger"></i>',
-    'equal': '<i class="text-secondary fw-bold">=</i>',
-    'down': '<i class="bi bi-caret-down-fill text-success"></i>'
-}
-let price_today = {}
-let price_lastday = {}
+$(document).ready(function () {
+    let row_data_sembako = []
+    let row_data = []
+    const graph_icon = {
+        'up': '<i class="bi bi-caret-up-fill text-danger"></i>',
+        'equal': '<i class="text-secondary fw-bold">=</i>',
+        'down': '<i class="bi bi-caret-down-fill text-success"></i>'
+    }
+    let price_today = {}
+    let price_lastday = {}
 
-$.ajax({
-    url: {% url 'visitor:sembako' %},
-    success: function (data) {
-        row_data_sembako = data.data
-        row_data_sembako.forEach((item, index) => {
-            $('#table-body').append(renderTableBody(item, index))
-            detailSembako(item, index)
-            detailSembakoYesterday(item, index)
-        })
-
-
-    },
-})
-
-
-function detailSembako(sembako, index) {
-    const url = '{% url "visitor:sembako" %}?id_sembako=' + encodeURIComponent(sembako.groceries_id)
     $.ajax({
-        url: url,
-        success: function (value) {
-            const { data } = value
+        url: {% url 'visitor:sembako' %},
+        success: function (data) {
+            row_data_sembako = data.data
+            row_data = data
 
-            const item = data[0] || {}
-            const price = item.unit_groceries_price || 0
+            $('#last-page').text(data.total_pages)
+            $('#pagination-val').val(currentPage)
 
-            price_today[sembako.groceries_name] = price
-            renderStatistik(sembako.groceries_name)
 
-            $(`#price${index}`).text(price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'))
+            row_data_sembako.forEach((item, index) => {
+                $('#table-body').append(renderTableBody(item, index))
+                detailSembako(item, index)
+                detailSembakoYesterday(item, index)
+            })
+
+
         },
     })
-}
 
-function detailSembakoYesterday(sembako, index) {
-    const url = '{% url "visitor:sembako" %}?id_sembako=' + encodeURIComponent(sembako.groceries_id)
-        + '&create=yesterday'
-    $.ajax({
-        url: url,
-        success: function (value) {
-            const { data } = value
-            const price = data[0] ? data[0].unit_groceries_price : 0
 
-            price_lastday[sembako.groceries_name] = price
-            renderStatistik(sembako.groceries_name)
+    function detailSembako(sembako, index) {
+        const url = '{% url "visitor:sembako" %}?id_sembako=' + encodeURIComponent(sembako.groceries_id)
+        $.ajax({
+            url: url,
+            success: function (value) {
+                const { data } = value
 
-            $(`#price-yesterday${index}`).text(price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'))
+                const item = data[0] || {}
+                const price = item.unit_groceries_price || 0
+
+                price_today[sembako.groceries_name] = price
+                renderStatistik(sembako.groceries_name)
+
+                $(`#price${index}`).text(price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'))
+            },
+        })
+    }
+
+    function detailSembakoYesterday(sembako, index) {
+        const url = '{% url "visitor:sembako" %}?id_sembako=' + encodeURIComponent(sembako.groceries_id)
+            + '&create=yesterday'
+        $.ajax({
+            url: url,
+            success: function (value) {
+                const { data } = value
+                const price = data[0] ? data[0].unit_groceries_price : 0
+
+                price_lastday[sembako.groceries_name] = price
+                renderStatistik(sembako.groceries_name)
+
+                $(`#price-yesterday${index}`).text(price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'))
+            }
+        })
+    }
+
+    function renderTableBody(data, index) {
+        let number = (currentPage - 1) * 10 + (index + 1)
+        return `
+            <tr>
+                <td class="text-center">${number}</td>
+                <td>${data.groceries_name}</td>
+                <td id="quantity${index}" class="text-center">${data.groceries_quantity}</td>
+                <td id="unit${index}" class="text-center">${data.groceries_massa}</td>
+                <td id="price-yesterday${index}" class="text-center"></td>
+                <td id="price${index}" class="text-center"></td>
+                <td id="statistic-${data.groceries_name}" class="statistic text-center"></td>
+            </tr>
+        `
+    }
+
+    function renderStatistik(name) {
+      const today = Object.keys(price_today).find(item => item === name)
+      const yesterday = Object.keys(price_lastday).find(item => item === name)
+
+      if (!(today && yesterday)) {
+        return 0;
+      }
+
+      const price_now = price_today[name]
+      const price_last = price_lastday[name]
+
+      const icon = price_last > price_now ? 'down' : (price_now === price_last ? 'equal' : 'up');
+      document.getElementById(`statistic-${name}`).innerHTML = graph_icon[icon]
+
+    }
+
+    let currentPage = 1;
+
+
+    function updateTable(searchTerm, page) {
+        $.ajax({
+            url: '{% url "visitor:sembako" %}?nama_sembako=' + encodeURIComponent(searchTerm) + '&page=' + page,
+            success: function (data) {
+                row_data_sembako = data.data;
+                $('#table-body').empty();
+                currentPage = page;
+                row_data_sembako.forEach((item, index) => {
+                    $('#table-body').append(renderTableBody(item, index));
+                    detailSembako(item, index);
+                    detailSembakoYesterday(item, index);
+                });
+
+
+                $('#pagination-val').val(currentPage)
+
+                updatePagination(data.total_pages);
+            }
+        });
+    }
+
+    function updatePagination(totalPages) {
+        if (totalPages <= 1) {
+            $('#prev-page').addClass('disabled');
+            $('#next-page').addClass('disabled');
+        } else {
+            $('#prev-page').removeClass('disabled');
+            $('#next-page').removeClass('disabled');
         }
-    })
-}
 
-function renderTableBody(data, index) {
-    return `
-        <tr>
-            <td class="text-center">${index+1}</td>
-            <td>${data.groceries_name}</td>
-            <td id="quantity${index}" class="text-center">${data.groceries_quantity}</td>
-            <td id="unit${index}" class="text-center">${data.groceries_massa}</td>
-            <td id="price-yesterday${index}" class="text-center"></td>
-            <td id="price${index}" class="text-center"></td>
-            <td id="statistic-${data.groceries_name}" class="statistic text-center"></td>
-        </tr>
-    `
-}
+        if (currentPage === 1) {
+            $('#prev-page').addClass('disabled');
+        } else {
+            $('#prev-page').removeClass('disabled');
+        }
 
-function renderStatistik(name) {
-  const today = Object.keys(price_today).find(item => item === name)
-  const yesterday = Object.keys(price_lastday).find(item => item === name)
+        if (currentPage === totalPages) {
+            $('#next-page').addClass('disabled');
+        } else {
+            $('#next-page').removeClass('disabled');
+        }
+    }
 
-  if (!(today && yesterday)) {
-    return 0;
-  }
+    $('#prev-page').click(function () {
+        if (currentPage > 1) {
+            updateTable($('#search-input').val(), currentPage - 1);
+        }
+    });
 
-  const price_now = price_today[name]
-  const price_last = price_lastday[name]
+    $('#next-page').click(function () {
+        if (currentPage < row_data.total_pages) {
+            updateTable($('#search-input').val(), currentPage + 1);
+        }
+    });
 
-  const icon = price_last > price_now ? 'down' : (price_now === price_last ? 'equal' : 'up');
-  document.getElementById(`statistic-${name}`).innerHTML = graph_icon[icon]
+   $('#pagination-val').change(function() {
+      const newPage = parseInt($('#pagination-val').val());
+      if (newPage >= 1 && newPage <= row_data.total_pages && newPage !== currentPage) {
+        updateTable($('#search-input').val(), newPage);
+      } else {
+        $('#pagination-val').val(currentPage);
+      }
+    });
 
-}
+    $('#search-button').click(function () {
+        const searchTerm = $('#search-input').val();
+        currentPage = 1;
+        updateTable(searchTerm, currentPage);
+    });
+
+})
 
 
 
