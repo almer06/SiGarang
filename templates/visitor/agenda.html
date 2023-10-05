@@ -32,7 +32,7 @@
                         <th>{{ forloop.counter0|add:page_obj.start_index }}</th>
                         <th>{{ object.agenda_name }}</th>
                         <th>{{ object.agenda_place }}</th>
-                        <th class="text-center">{{ object.agenda_content}}</th>
+                        <th style="text-align: justify">{{ object.agenda_content}}</th>
                         <th class="text-center">{{ object.agenda_date_time|date:'SHORT_DATE_FORMAT' }}</th>
                     </tr>
                 {% empty %}
