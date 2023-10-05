@@ -186,6 +186,7 @@ $(document).ready(function () {
             url: '{% url "visitor:sembako" %}?nama_sembako=' + encodeURIComponent(searchTerm) + '&page=' + page,
             success: function (data) {
                 row_data_sembako = data.data;
+                row_data = data
                 $('#table-body').empty();
                 currentPage = page;
                 row_data_sembako.forEach((item, index) => {
@@ -196,6 +197,9 @@ $(document).ready(function () {
 
 
                 $('#pagination-val').val(currentPage)
+                let totalPages = row_data.total_pages;
+                $('#last-page').text(totalPages);
+
 
                 updatePagination(data.total_pages);
             }
