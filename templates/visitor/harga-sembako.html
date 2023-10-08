@@ -1,4 +1,5 @@
 {% extends 'visitor/layouts/base.html' %}
+{% load static %}
 
 {% block content %}
 
@@ -21,7 +22,30 @@ input[type=number] {
 
     <div class="container">
 
+
+
         <h1 class="text-center text-success mb-3">HARGA SEMBAKO</h1>
+
+        <div class="row">
+            <div class="col-12 col-md-6 col-lg-2">
+                <select class="form-select" aria-label="select nama sembako" id="name-sembako"></select>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="row">
+                    <div class="col-6">
+                        <input type="date" class="form-control" id="start-date">
+                    </div>
+                    <div class="col-6">
+                        <input type="date" class="form-control" id="end-date">
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <button id="search-statistic" class="btn btn-primary px-4">Cari</button>
+            </div>
+        </div>
+        <div id="sembako-chart"></div>
+
         {% if user.is_authenticated %}
             <a href="{% url 'visitor:excel_sembako' %}" class="btn btn-primary mt-4 mb-3">Export Excel</a>
         {% endif %}
@@ -72,15 +96,18 @@ input[type=number] {
           </ul>
         </nav>
 
+
     </div>
 
 
 {% endblock %}
 
 {% block script %}
-<script>
+<script src="{% static 'vendor/script/apexchart.js' %}"></script>
 
+<script>
 $(document).ready(function () {
+
     let row_data_sembako = []
     let row_data = []
     const graph_icon = {
@@ -90,6 +117,17 @@ $(document).ready(function () {
     }
     let price_today = {}
     let price_lastday = {}
+
+    const oneWeekFromToday = new Date();
+
+    oneWeekFromToday.setDate(oneWeekFromToday.getDate() - 7);
+    const formattedDate = oneWeekFromToday.toISOString().split('T')[0];
+
+    const today = new Date();
+    const formattedToday = today.toISOString().split('T')[0];
+
+    $('#start-date').val(formattedDate);
+    $('#end-date').val(formattedToday);
 
     $.ajax({
         url: {% url 'visitor:sembako' %},
@@ -103,11 +141,12 @@ $(document).ready(function () {
 
             row_data_sembako.forEach((item, index) => {
                 $('#table-body').append(renderTableBody(item, index))
+                $('#name-sembako').append(createOption(item.groceries_id, item.groceries_name))
                 detailSembako(item, index)
                 detailSembakoYesterday(item, index)
             })
 
-
+            dataStatisticSembako()
         },
     })
 
@@ -161,6 +200,7 @@ $(document).ready(function () {
             </tr>
         `
     }
+
 
     function renderStatistik(name) {
       const today = Object.keys(price_today).find(item => item === name)
@@ -247,7 +287,7 @@ $(document).ready(function () {
       } else {
         $('#pagination-val').val(currentPage);
       }
-    });
+   });
 
     $('#search-button').click(function () {
         const searchTerm = $('#search-input').val();
@@ -255,6 +295,54 @@ $(document).ready(function () {
         updateTable(searchTerm, currentPage);
     });
 
+    function dataStatisticSembako() {
+    let id_sembako = $('#name-sembako').val()
+    let start_date = $('#start-date').val()
+    let end_date = $('#end-date').val()
+
+    const url = '{% url "visitor:statistic-sembako" %}?id_sembako=' + encodeURIComponent(id_sembako) +
+            '&start_date=' + encodeURIComponent(start_date) +
+            '&end_date=' + encodeURIComponent(end_date);
+    $.ajax({
+        url: url,
+        success: function (value) {
+            const { data } = value
+            let options = {
+                chart: {
+                    type: 'area'
+                },
+                series: [{
+                    name: 'sales',
+                    data: data.map(item => item.unit_groceries_price)
+                }],
+                xaxis: {
+                    categories: data.map(item => item.unit_groceries_created)
+                },
+            };
+
+            // Hapus chart sebelumnya jika ada
+            if (window.chart) {
+                window.chart.destroy();
+            }
+
+            // Buat chart baru
+            const chart = new ApexCharts(document.querySelector("#sembako-chart"), options);
+            chart.render();
+
+            // Simpan referensi chart dalam window
+            window.chart = chart;
+        },
+    })
+}
+
+
+    $('#search-statistic').click(() => {
+        dataStatisticSembako()
+    })
+
+    function createOption(value, label) {
+      return `<option value="${value}">${label}</option>`
+    }
 })
 
 

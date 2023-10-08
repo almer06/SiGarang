@@ -765,3 +765,46 @@ class ExportStockItemToExcel(LoginRequiredMixin, View):
         df.to_excel(response, index=False, engine='openpyxl')
 
         return response
+
+
+def daterange(start_date, end_date):
+    for n in range(int((end_date - start_date).days)):
+        yield start_date + timedelta(n)
+
+
+def dataForStatisticSembako(request):
+    today = datetime.today().date()
+    one_week_ago = today - timedelta(days=7)
+
+    id_sembako = request.GET.get('id_sembako')
+    start_date_str = request.GET.get('start_date', one_week_ago.strftime('%Y-%m-%d'))
+    end_date_str = request.GET.get('end_date', today.strftime('%Y-%m-%d'))
+
+    if not id_sembako:
+        return JsonResponse({'success': False, 'error': 'id_sembako harus diisi'})
+
+    start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+    end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+
+    result_data = []
+
+    for single_date in daterange(start_date, end_date):
+        try:
+            query = UnitGroceries.objects.get(
+                unit_groceries_variant_id=id_sembako,
+                unit_groceries_created=single_date,
+            )
+            result_data.append({
+                'unit_groceries_price': query.unit_groceries_price,
+                'unit_groceries_created': query.unit_groceries_created
+            })
+        except UnitGroceries.DoesNotExist:
+            result_data.append({
+                'unit_groceries_price': 0,
+                'unit_groceries_created': single_date
+            })
+
+    return JsonResponse({
+        'success': True,
+        'data': result_data
+    })
