@@ -22,45 +22,55 @@ input[type=number] {
 
     <div class="container">
 
-
-
         <h1 class="text-center text-success mb-3">HARGA SEMBAKO</h1>
 
+
         <div class="row">
-            <div class="col-12 col-md-6 col-lg-2">
-                <select class="form-select" aria-label="select nama sembako" id="name-sembako"></select>
+            <div class="col-12 col-md-6">
+                <div class="row mb-3" style="row-gap: 1rem">
+                    <div class="col-12 col-lg-3">
+                        <select class="form-select" aria-label="select nama sembako" id="name-sembako"></select>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="row">
+                            <div class="col-6">
+                                <input type="date" class="form-control" id="start-date">
+                            </div>
+                            <div class="col-6">
+                                <input type="date" class="form-control" id="end-date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button id="search-statistic" class="btn btn-primary px-4">Cari</button>
+                    </div>
+                </div>
+                <div id="sembako-chart"></div>
             </div>
-            <div class="col-12 col-md-4">
+
+            <div class="col-12 col-md-6">
+
+
                 <div class="row">
-                    <div class="col-6">
-                        <input type="date" class="form-control" id="start-date">
+                    <div class="col-12 col-md-12 col-lg-4">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="search-input"
+                                   placeholder="Cari Nama Sembako">
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <input type="date" class="form-control" id="end-date">
+                    <div class="col-12 col-lg-6">
+                        <div class="row">
+                            <div class="col-6">
+                                <button type="submit" id="search-button" class="btn btn-primary px-4 mb-3 w-100">Cari</button>
+                            </div>
+                            <div class="col-6">
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'visitor:excel_sembako' %}" class="btn btn-primary mb-3 w-100">Export Excel</a>
+                            {% endif %}
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-6 col-md-4">
-                <button id="search-statistic" class="btn btn-primary px-4">Cari</button>
-            </div>
-        </div>
-        <div id="sembako-chart"></div>
-
-        {% if user.is_authenticated %}
-            <a href="{% url 'visitor:excel_sembako' %}" class="btn btn-primary mt-4 mb-3">Export Excel</a>
-        {% endif %}
-
-        <div class="row">
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="mb-3">
-                    <input type="text" class="form-control" id="search-input"
-                           placeholder="Cari Nama Sembako">
-                </div>
-            </div>
-            <div class="col-12 col-md-6 col-lg-4">
-                <button type="submit" id="search-button" class="btn btn-primary px-4 mb-3">Cari</button>
-            </div>
-        </div>
 
 
 
@@ -69,12 +79,12 @@ input[type=number] {
                 <thead class="table-success">
                     <tr>
                         <th class="text-center">No.</th>
-                        <th class="text-center">Nama Variant</th>
-                        <th class="text-center">Kuantitas</th>
-                        <th class="text-center">Satuan</th>
-                        <th class="text-center">Harga Kemarin</th>
-                        <th class="text-center">Harga Hari ini</th>
-                        <th class="text-center">Statistik</th>
+                        <th class="text-center" style="white-space: nowrap">Nama Variant</th>
+                        <th class="text-center" style="white-space: nowrap">Kuantitas</th>
+                        <th class="text-center" style="white-space: nowrap">Satuan</th>
+                        <th class="text-center" style="white-space: nowrap">Kemarin</th>
+                        <th class="text-center" style="white-space: nowrap">Hari ini</th>
+                        <th class="text-center" style="white-space: nowrap">Statistik</th>
                     </tr>
                 </thead>
                 <tbody id="table-body"></tbody>
@@ -95,6 +105,12 @@ input[type=number] {
             </li>
           </ul>
         </nav>
+            </div>
+
+        </div>
+
+
+
 
 
     </div>
@@ -312,7 +328,7 @@ $(document).ready(function () {
                     type: 'area'
                 },
                 series: [{
-                    name: 'sales',
+                    name: $('#name-sembako option:selected').text(),
                     data: data.map(item => item.unit_groceries_price)
                 }],
                 xaxis: {
@@ -320,16 +336,13 @@ $(document).ready(function () {
                 },
             };
 
-            // Hapus chart sebelumnya jika ada
             if (window.chart) {
                 window.chart.destroy();
             }
 
-            // Buat chart baru
             const chart = new ApexCharts(document.querySelector("#sembako-chart"), options);
             chart.render();
 
-            // Simpan referensi chart dalam window
             window.chart = chart;
         },
     })
