@@ -23,6 +23,7 @@ urlpatterns = [
     path('kios-pupuk/<slug:slug>', views.KiosPupukDetailView.as_view(), name='kios_pupuk_detail'),
     path('stok-barang/', views.StockItemListView.as_view(), name='stock_barang'),
     path('statistic-sembako/', views.dataForStatisticSembako, name='statistic-sembako'),
+    path('all-variant/', views.allVariantSembako, name='all-variant-sembako'),
     path('export-excel-sembako/', views.export_excel_harga_sembako, name='excel_sembako'),
     path('import-excel-sembako/', views.import_excel_sembako, name='import_sembako'),
     path('export-excel-ukm', views.export_ukm_to_excel, name='excel_ukm'),

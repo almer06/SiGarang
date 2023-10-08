@@ -157,9 +157,20 @@ $(document).ready(function () {
 
             row_data_sembako.forEach((item, index) => {
                 $('#table-body').append(renderTableBody(item, index))
-                $('#name-sembako').append(createOption(item.groceries_id, item.groceries_name))
                 detailSembako(item, index)
                 detailSembakoYesterday(item, index)
+            })
+
+        },
+    })
+
+    $.ajax({
+        url: {% url 'visitor:all-variant-sembako' %},
+        success: function (res) {
+            const { data } = res
+
+            data.forEach((item) => {
+                $('#name-sembako').append(createOption(item.groceries_id, item.groceries_name))
             })
 
             dataStatisticSembako()

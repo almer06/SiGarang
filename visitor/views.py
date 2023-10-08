@@ -768,7 +768,7 @@ class ExportStockItemToExcel(LoginRequiredMixin, View):
 
 
 def daterange(start_date, end_date):
-    for n in range(int((end_date - start_date).days)+1):
+    for n in range(int((end_date - start_date).days) + 1):
         yield start_date + timedelta(n)
 
 
@@ -807,4 +807,13 @@ def dataForStatisticSembako(request):
     return JsonResponse({
         'success': True,
         'data': result_data
+    })
+
+
+def allVariantSembako(request):
+    query = VariantGroceries.objects.all().values('groceries_name', 'groceries_id')
+
+    return JsonResponse({
+        'success': True,
+        'data': list(query)
     })
