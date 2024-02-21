@@ -66,6 +66,7 @@ class UnitGroceriesAdmin(admin.ModelAdmin):
     list_per_page = 10
     form = UnitGroceriesForm
     add_form_template = 'admin/administrator/unitgroceries/add_form.html'
+    change_form_template = 'admin/administrator/unitgroceries/add_form.html'
 
     class Media:
         css = {

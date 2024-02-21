@@ -13,8 +13,13 @@ class LoginForm(forms.ModelForm):
 
 
 class UnitGroceriesForm(forms.ModelForm):
-    price_yesterday = forms.IntegerField(label='Harga Kemarin', min_value=0, initial=0,
-                                         widget=forms.TextInput(attrs={'disabled': 'true'}))
+    price_yesterday = forms.IntegerField(label='Harga Kemarin', min_value=0, initial=0, required=False,
+                                         widget=forms.TextInput(
+                                             attrs={
+                                                 'disabled': True,
+                                                 'style': 'border: none'
+                                             }
+                                         ))
 
     class Meta:
         model = UnitGroceries
