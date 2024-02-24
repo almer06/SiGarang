@@ -834,7 +834,7 @@ def export_groceries_data(request):
     ws.append([])  # Untuk memberi jarak antara judul dan data
 
     # Menuliskan header
-    header = ["Nama Sembako", "Satuan", "Harga Hari Ini", "Harga Kemarin"]
+    header = ["Nama Sembako", "Kuantitas","Satuan", "Harga Hari Ini", "Harga Kemarin"]
     ws.append(header)
 
     # Mengatur format header menjadi tebal (bold)
@@ -857,10 +857,10 @@ def export_groceries_data(request):
         today_price = variant.unit_groceries.filter(unit_groceries_created=date.today()).first()
         today_price = today_price.unit_groceries_price if today_price else 0
 
-        ws.append([variant.groceries_name, variant.groceries_massa, today_price, yesterday_price])
+        ws.append([variant.groceries_name, variant.groceries_quantity,variant.groceries_massa, today_price, yesterday_price])
 
     # Mengatur data menjadi tabel
-    for row in ws.iter_rows(min_row=4, max_row=ws.max_row, min_col=1, max_col=4):
+    for row in ws.iter_rows(min_row=4, max_row=ws.max_row, min_col=1, max_col=5):
         for cell in row:
             cell.alignment = Alignment(horizontal='center')
             cell.border = Border(top=Side(style='thin'),
