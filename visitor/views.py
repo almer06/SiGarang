@@ -1,28 +1,28 @@
-import csv
 from datetime import date, timedelta, datetime
 
 import pandas as pd
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.paginator import Paginator
 from django.db import connection
 from django.http import HttpResponseForbidden, HttpResponseRedirect, HttpRequest, JsonResponse, HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.generic import ListView, DetailView, CreateView, TemplateView, View
-from django.contrib.sites.shortcuts import get_current_site
-from django.shortcuts import redirect
-from django.views.decorators.csrf import csrf_exempt
-from django.core.paginator import Paginator
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment, Border, Side
+from openpyxl.workbook.child import INVALID_TITLE_REGEX
 
 from administrator.models import (UKM, IKM, Agenda, Document, UnitGroceries,
                                   VariantGroceries, Market, KiosPupuk, AgenLPG, StockItem)
 from visitor.forms import CustomUserCreationForm, SendInBluePasswordResetForm
 from visitor.models import User
-from visitor.tokens import activation_account
 from visitor.sendinblue import SendInBlue
+from visitor.tokens import activation_account
 
 
 class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -817,3 +817,59 @@ def allVariantSembako(request):
         'success': True,
         'data': list(query)
     })
+
+
+def export_groceries_data(request):
+    today = date.today().strftime('%d/%B/%Y')
+    title = INVALID_TITLE_REGEX.sub('_', f"Harga_sembako_{today}")
+
+    # Membuat workbook baru
+    wb = Workbook()
+    ws = wb.active
+    ws.title = title
+
+    # Menambahkan judul "Tambah Sembako" dan tanggal ekspor
+    ws.append(["Harga Sembako"])
+    ws.append([f"Tanggal Export: {today}"])
+    ws.append([])  # Untuk memberi jarak antara judul dan data
+
+    # Menuliskan header
+    header = ["Nama Sembako", "Kuantitas","Satuan", "Harga Hari Ini", "Harga Kemarin"]
+    ws.append(header)
+
+    # Mengatur format header menjadi tebal (bold)
+    for cell in ws[1]:
+        cell.font = Font(bold=True, sz=16)
+
+    # Mendapatkan tanggal kemarin
+    yesterday = date.today() - timedelta(days=1)
+
+    # Mendapatkan semua data VariantGroceries
+    variant_groceries = VariantGroceries.objects.all()
+
+    # Mengisi data ke dalam file Excel
+    for variant in variant_groceries:
+        # Mengambil harga kemarin
+        yesterday_price = variant.unit_groceries.filter(unit_groceries_created=yesterday).first()
+        yesterday_price = yesterday_price.unit_groceries_price if yesterday_price else 0
+
+        # Mengambil harga hari ini
+        today_price = variant.unit_groceries.filter(unit_groceries_created=date.today()).first()
+        today_price = today_price.unit_groceries_price if today_price else 0
+
+        ws.append([variant.groceries_name, variant.groceries_quantity,variant.groceries_massa, today_price, yesterday_price])
+
+    # Mengatur data menjadi tabel
+    for row in ws.iter_rows(min_row=4, max_row=ws.max_row, min_col=1, max_col=5):
+        for cell in row:
+            cell.alignment = Alignment(horizontal='center')
+            cell.border = Border(top=Side(style='thin'),
+                                 right=Side(style='thin'),
+                                 bottom=Side(style='thin'),
+                                 left=Side(style='thin'))
+
+    # Menggunakan HttpResponse untuk mengirim file Excel ke client
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename={title}.xlsx'
+    wb.save(response)
+    return response

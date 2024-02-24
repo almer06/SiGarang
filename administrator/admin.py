@@ -1,4 +1,6 @@
 from django.contrib import admin
+
+from administrator.forms import UnitGroceriesForm
 from administrator.models import (Agenda, UKM, IKM, Document, UnitGroceries,
                                   VariantGroceries, Market, AgenLPG, KiosPupuk, StockItem)
 from django.urls import path
@@ -62,6 +64,9 @@ class UnitGroceriesAdmin(admin.ModelAdmin):
     list_filter = ('unit_groceries_created',)
     search_fields = ['unit_groceries_variant_id__groceries_name']
     list_per_page = 10
+    form = UnitGroceriesForm
+    add_form_template = 'admin/administrator/unitgroceries/add_form.html'
+    change_form_template = 'admin/administrator/unitgroceries/add_form.html'
 
     class Media:
         css = {
